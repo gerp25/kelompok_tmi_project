@@ -1,6 +1,6 @@
 <?php
-// Mendapatkan nama file yang sedang diakses untuk mengatur menu mana yang sedang aktif (active class)
-$current_page = basename($_SERVER['PHP_SELF']);
+// Deteksi path script yang sedang dibuka (lebih akurat daripada REQUEST_URI)
+$current_script = $_SERVER['SCRIPT_NAME'];
 ?>
 
 <aside id="leftsidebar" class="sidebar">
@@ -17,7 +17,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="btn-group user-helper-dropdown">
                 <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
                 <ul class="dropdown-menu pull-right">
-                    <li><a href="ganti_password.php"><i class="material-icons">lock</i>Ganti Password</a></li>
+                    <li><a href="../kasir_ganti_password/index.php"><i class="material-icons">lock</i>Ganti Password</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a href="../logout.php"><i class="material-icons">input</i>Sign Out</a></li>
                 </ul>
@@ -32,47 +32,47 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <li class="header">NAVIGASI UTAMA</li>
             
             <!-- Dashboard Kasir -->
-            <li class="<?= ($current_page == 'index.php' || $current_page == 'dashboard.php') ? 'active' : ''; ?>">
-                <a href="index.php">
+            <li class="<?= (strpos($current_script, 'home_kasir') !== false) ? 'active' : ''; ?>">
+                <a href="../home_kasir/index.php">
                     <i class="material-icons">dashboard</i>
                     <span>Dashboard</span>
                 </a>
             </li>
 
             <!-- Form Transaksi / POS Utama -->
-            <li class="<?= ($current_page == 'transaksi.php' || $current_page == 'pos.php') ? 'active' : ''; ?>">
-                <a href="transaksi.php">
+            <li class="<?= (strpos($current_script, 'kasir_transaksi') !== false) ? 'active' : ''; ?>">
+                <a href="../kasir_transaksi/">
                     <i class="material-icons">shopping_cart</i>
                     <span>Transaksi Penjualan</span>
                 </a>
             </li>
 
             <!-- Riwayat Transaksi -->
-            <li class="<?= ($current_page == 'riwayat_transaksi.php') ? 'active' : ''; ?>">
-                <a href="riwayat_transaksi.php">
+            <li class="<?= (strpos($current_script, 'kasir_riwayat_transaksi') !== false) ? 'active' : ''; ?>">
+                <a href="../kasir_riwayat_transaksi/">
                     <i class="material-icons">receipt</i>
                     <span>Riwayat Transaksi</span>
                 </a>
             </li>
 
             <!-- Daftar Menu & Stok -->
-            <li class="<?= ($current_page == 'daftar_menu.php') ? 'active' : ''; ?>">
-                <a href="daftar_menu.php">
+            <li class="<?= (strpos($current_script, 'kasir_daftar_stok_menu') !== false) ? 'active' : ''; ?>">
+                <a href="../kasir_daftar_stok_menu/">
                     <i class="material-icons">restaurant_menu</i>
                     <span>Daftar & Stok Menu</span>
                 </a>
             </li>
 
             <!-- Rekap Shift Harian -->
-            <li class="<?= ($current_page == 'rekap_shift.php') ? 'active' : ''; ?>">
-                <a href="rekap_shift.php">
+            <li class="<?= (basename($current_script) == 'rekap_shift.php') ? 'active' : ''; ?>">
+                <a href="../kasir_rekap_kas/">
                     <i class="material-icons">today</i>
                     <span>Rekap Kas Harian</span>
                 </a>
             </li>
 
             <!-- Ganti Password -->
-            <li class="<?= (strpos($current_page, 'kasir_ganti_password') !== false) ? 'active' : ''; ?>">
+            <li class="<?= (strpos($current_script, 'kasir_ganti_password') !== false) ? 'active' : ''; ?>">
                 <a href="../kasir_ganti_password/index.php">
                     <i class="material-icons">lock</i>
                     <span>Ganti Password</span>

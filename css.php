@@ -48,3 +48,5 @@
 <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
 <link href="../AdminBSB/css/style.css" rel="stylesheet">
 <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+<link href="../AdminBSB/plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+

@@ -6,7 +6,7 @@ $_SESSION = array();
 session_destroy();
 echo "<script>
     alert('Anda telah berhasil keluar.');
-    window.location.href = '../resto_project/login';
+    window.location.href = '../project_resto_real/login';
 </script>";
 exit();
 ?>

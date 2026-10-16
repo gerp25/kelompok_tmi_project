@@ -66,43 +66,6 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
                 </div>
             </div>
 
-            <!-- RINGKASAN / STATISTIK CEPAT KASIR -->
-            <!-- <div class="row clearfix">
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="info-box bg-pink">
-                        <div class="icon">
-                            <i class="material-icons">shopping_cart</i>
-                        </div>
-                        <div class="content">
-                            <div class="text">TRANSAKSI HARI INI</div>
-                            <div class="number">--</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="info-box bg-cyan">
-                        <div class="icon">
-                            <i class="material-icons">today</i>
-                        </div>
-                        <div class="content">
-                            <div class="text">PENDAPATAN HARI INI</div>
-                            <div class="number">Rp --</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="info-box bg-light-green">
-                        <div class="icon">
-                            <i class="material-icons">restaurant_menu</i>
-                        </div>
-                        <div class="content">
-                            <div class="text">MENU TERSEDIA</div>
-                            <div class="number">--</div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
             <?php include '../footer.php'; ?>
 
         </div>

@@ -26,9 +26,13 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
     <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <!-- Waves Effect Css -->
     <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
+    <!-- Animation Css -->
     <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
+    <!-- Custom Css -->
     <link href="../AdminBSB/css/style.css" rel="stylesheet">
+    <!-- AdminBSB Themes -->
     <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
 </head>
 
@@ -128,9 +132,32 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
         </div>
     </section>
 
+    <!-- Jquery Core Js -->
     <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap Core Js -->
     <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
+    <!-- Slimscroll Plugin Js -->
+    <script src="../AdminBSB/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+    <!-- Waves Effect Plugin Js -->
     <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
+    <!-- Custom Js -->
     <script src="../AdminBSB/js/admin.js"></script>
+
+    <script>
+    // Inisialisasi SlimScroll agar sidebar bisa di-scroll dengan rapi
+    $(document).ready(function() {
+        if ($.fn.slimScroll) {
+            $('.list').slimscroll({
+                height: 'calc(100vh - 60px)',
+                size: '4px',
+                position: 'right',
+                color: 'rgba(0,0,0,0.2)',
+                alwaysVisible: false,
+                borderRadius: '0',
+                railBorderRadius: '0'
+            });
+        }
+    });
+    </script>
 </body>
 </html>

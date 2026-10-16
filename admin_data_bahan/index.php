@@ -13,6 +13,16 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     echo '<script>window.location.href ="../logout.php";</script>';
     exit();
 }
+
+// AMBIL SEMUA DATA BAHAN BAKU TERLEBIH DAHULU
+$data_bahan = [];
+$query_bahan = mysqli_query($con, "SELECT * FROM bahan_baku ORDER BY nama_bahan ASC");
+
+if ($query_bahan && mysqli_num_rows($query_bahan) > 0) {
+    while ($row = mysqli_fetch_assoc($query_bahan)) {
+        $data_bahan[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +63,7 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
                         <div class="header">
                             <h2>
                                 DAFTAR BAHAN BAKU
-                                <small>Kelola persediaan dan harga satuan bahan baku masakan di sini</small>
+                                <small>Kelola persediaan dan satuan bahan baku masakan di sini</small>
                             </h2>
                             <ul class="header-dropdown m-r--5">
                                 <li>
@@ -68,62 +78,33 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
                             <table class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="5%" class="text-center">No.</th>
-                                        <th width="30%">Nama Bahan</th>
-                                        <th width="15%" class="text-center">Stok</th>
-                                        <th width="15%" class="text-center">Satuan</th>
-                                        <th width="15%">Harga Satuan</th>
+                                        <th width="10%" class="text-center">No.</th>
+                                        <th width="50%">Nama Bahan</th>
+                                        <th width="20%" class="text-center">Satuan</th>
                                         <th width="20%" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query_bahan = mysqli_query($con, "SELECT * FROM bahan_baku ORDER BY nama_bahan ASC");
-                                    $no = 1;
-
-                                    while ($data = mysqli_fetch_array($query_bahan)) {
-                                        $id_row = $no;
-                                        $id_primary = $data['id'];
+                                    if (!empty($data_bahan)) {
+                                        $no = 1;
+                                        foreach ($data_bahan as $data) {
+                                            $id_primary = $data['id'];
                                     ?>
                                     <tr>
-                                        <td class="text-center"><?= $no; ?></td>
+                                        <td class="text-center"><?= $no++; ?></td>
                                         <td><strong><?= htmlspecialchars($data['nama_bahan']); ?></strong></td>
-                                        <td class="text-center"><?= $data['stok'];?></td>
                                         <td class="text-center"><?= htmlspecialchars($data['satuan']); ?></td>
-                                        <td>Rp <?= number_format($data['harga_satuan'], 0, ',', '.'); ?></td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-success waves-effect" data-toggle="modal" data-target="#modalDetail<?= $id_row; ?>" title="Detail Bahan"><i class="material-icons">visibility</i></button>
+                                            <button type="button" class="btn btn-sm btn-success waves-effect" data-toggle="modal" data-target="#modalDetail<?= $id_primary; ?>" title="Detail Bahan"><i class="material-icons">visibility</i></button>
                                             <a href="edit.php?id=<?= urlencode($id_primary); ?>" class="btn btn-sm btn-info waves-effect" title="Edit"><i class="material-icons">edit</i></a>
                                             <a href="hapus.php?id=<?= urlencode($id_primary); ?>" class="btn btn-sm btn-danger waves-effect" title="Hapus" onclick="return confirm('Yakin ingin menghapus bahan <?= htmlspecialchars($data['nama_bahan']); ?>?');"><i class="material-icons">delete</i></a>
                                         </td>
                                     </tr>
-
-                                    <!-- MODAL DETAIL BAHAN BAKU -->
-                                    <div class="modal fade" id="modalDetail<?= $id_row; ?>" tabindex="-1" role="dialog">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header bg-green">
-                                                    <h4 class="modal-title">Detail Bahan: <?= htmlspecialchars($data['nama_bahan']); ?></h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p><strong>Nama Bahan:</strong> <?= htmlspecialchars($data['nama_bahan']); ?></p>
-                                                    <p><strong>Jumlah Stok Tersedia:</strong> <?= number_format($data['stok'], 2, ',', '.'); ?> <?= htmlspecialchars($data['satuan']); ?></p>
-                                                    <p><strong>Harga per Satuan:</strong> Rp <?= number_format($data['harga_satuan'], 0, ',', '.'); ?> / <?= htmlspecialchars($data['satuan']); ?></p>
-                                                    <p><strong>Terakhir Diperbarui:</strong> <?= $data['updated_at'] ?? $data['created_at']; ?></p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">TUTUP</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- END MODAL -->
-
                                     <?php 
-                                        $no++;
-                                    } 
-                                    if(mysqli_num_rows($query_bahan) == 0){
-                                        echo '<tr><td colspan="6" class="text-center">Belum ada data bahan baku.</td></tr>';
+                                        }
+                                    } else {
+                                        echo '<tr><td colspan="4" class="text-center">Belum ada data bahan baku.</td></tr>';
                                     }
                                     ?>
                                 </tbody>
@@ -139,9 +120,35 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
+    <!-- MODAL DETAIL BAHAN BAKU -->
+    <?php
+    if (!empty($data_bahan)) {
+        foreach ($data_bahan as $data) {
+            $id_primary = $data['id'];
+    ?>
+    <div class="modal fade" id="modalDetail<?= $id_primary; ?>" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-green">
+                    <h4 class="modal-title">Detail Bahan: <?= htmlspecialchars($data['nama_bahan']); ?></h4>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nama Bahan:</strong> <?= htmlspecialchars($data['nama_bahan']); ?></p>
+                    <p><strong>Satuan:</strong> <?= htmlspecialchars($data['satuan']); ?></p>
+                    <p><strong>Terakhir Diperbarui:</strong> <?= $data['updated_at'] ?? $data['created_at']; ?></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">TUTUP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php 
+        }
+    }
+    ?>
+
+    <?php include '../script.php'; ?>
+    
 </body>
 </html>

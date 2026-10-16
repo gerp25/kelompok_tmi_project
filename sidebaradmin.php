@@ -44,12 +44,12 @@ $current_page = $_SERVER['REQUEST_URI'];
             </li>
 
             <!-- Menu Data Bahan yang ditambahkan kembali -->
-            <li class="<?= (strpos($current_page, 'admin_data_bahan') !== false) ? 'active' : ''; ?>">
+            <!-- <li class="<?= (strpos($current_page, 'admin_data_bahan') !== false) ? 'active' : ''; ?>">
                 <a href="../admin_data_bahan/index.php">
                     <i class="material-icons">inventory_2</i>
                     <span>Data Bahan</span>
                 </a>
-            </li>
+            </li> -->
             
             <li class="<?= (strpos($current_page, 'admin_kategori_menu') !== false) ? 'active' : ''; ?>">
                 <a href="../admin_kategori_menu/index.php">
@@ -71,6 +71,21 @@ $current_page = $_SERVER['REQUEST_URI'];
                 <a href="../admin_pembelian/index.php">
                     <i class="material-icons">shopping_cart</i>
                     <span>Data Pembelian</span>
+                </a>
+            </li>
+
+            <!-- Menu Data Pemnjual -->
+            <li class="<?= (strpos($current_page, 'admin_penjualan') !== false) ? 'active' : ''; ?>">
+                <a href="../admin_penjualan/">
+                    <i class="material-icons">shopping_cart</i>
+                    <span>Data Penjualan</span>
+                </a>
+            </li>
+
+            <li class="<?= (strpos($current_page, 'data_laporan') !== false) ? 'active' : ''; ?>">
+                <a href="../admin_data_laporan/">
+                    <i class="material-icons">assessment</i>
+                    <span>Laporan Laba Rugi</span>
                 </a>
             </li>
             

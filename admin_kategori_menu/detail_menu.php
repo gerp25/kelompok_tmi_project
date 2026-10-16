@@ -49,11 +49,7 @@ $badge_class = ($status == 'tersedia') ? 'bg-green' : 'bg-red';
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
 
     <style>
         .detail-card {
@@ -186,9 +182,6 @@ $badge_class = ($status == 'tersedia') ? 'bg-green' : 'bg-red';
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
+    <?php include '../script.php'; ?>
 </body>
 </html>

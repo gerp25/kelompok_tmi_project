@@ -5,11 +5,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once '../database/koneksi.php';
 
-$authority = @$_SESSION['peran'];
+$authority     = @$_SESSION['peran'];
 $is_2fa_passed = @$_SESSION['is_2fa_passed'];
 
 if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
-    echo '<script>alert ("Akses ditolak. Silakan login kembali.");</script>';
+    echo '<script>alert("Akses ditolak. Silakan login kembali.");</script>';
     echo '<script>window.location.href ="../logout.php";</script>';
     exit();
 }
@@ -26,6 +26,7 @@ if (isset($_POST['simpan'])) {
     } else {
         $query = "UPDATE supplier SET nama_supplier='$nama_supplier', alamat='$alamat', no_telp='$no_telp' WHERE id_supplier='$id_supplier'";
     }
+    
     mysqli_query($con, $query);
     header("Location: index.php");
     exit();
@@ -39,7 +40,6 @@ if (isset($_GET['hapus'])) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 
@@ -47,20 +47,13 @@ if (isset($_GET['hapus'])) {
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title>Data Supplier - Bakul Sega Bu Lastri</title>
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <!-- Bootstrap Core Css -->
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <!-- Waves Effect Css -->
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <!-- Animation Css -->
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <!-- Custom Css -->
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <!-- AdminBSB Themes -->
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
+
 </head>
 
 <body class="theme-red">
@@ -110,26 +103,27 @@ if (isset($_GET['hapus'])) {
                                     if ($data && mysqli_num_rows($data) > 0) {
                                         while ($d = mysqli_fetch_array($data)) {
                                     ?>
-                                    <tr>
-                                        <td><?= $no++; ?></td>
-                                        <td><?= htmlspecialchars($d['nama_supplier']); ?></td>
-                                        <td><?= htmlspecialchars($d['alamat']); ?></td>
-                                        <td><?= htmlspecialchars($d['no_telp']); ?></td>
-                                        <td>
-                                            <button class="btn btn-xs btn-warning waves-effect" 
-                                                    onclick="editData(<?= $d['id_supplier']; ?>, '<?= addslashes($d['nama_supplier']); ?>', 
-                                                    '<?= addslashes($d['alamat']); ?>', '<?= $d['no_telp']; ?>')" title="Edit">
-                                                <i class="material-icons">edit</i>
-                                            </button>
+                                            <tr>
+                                                <td><?= $no++; ?></td>
+                                                <td><?= htmlspecialchars($d['nama_supplier']); ?></td>
+                                                <td><?= htmlspecialchars($d['alamat']); ?></td>
+                                                <td><?= htmlspecialchars($d['no_telp']); ?></td>
+                                                <td>
+                                                    <button class="btn btn-xs btn-warning waves-effect" 
+                                                            onclick="editData(<?= $d['id_supplier']; ?>, '<?= addslashes($d['nama_supplier']); ?>', '<?= addslashes($d['alamat']); ?>', '<?= $d['no_telp']; ?>')" 
+                                                            title="Edit">
+                                                        <i class="material-icons">edit</i>
+                                                    </button>
 
-                                            <a href="index.php?hapus=<?= $d['id_supplier']; ?>" 
-                                            class="btn btn-xs btn-danger waves-effect" 
-                                            onclick="return confirm('Yakin ingin menghapus data?')" title="Hapus">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <?php 
+                                                    <a href="index.php?hapus=<?= $d['id_supplier']; ?>" 
+                                                       class="btn btn-xs btn-danger waves-effect" 
+                                                       onclick="return confirm('Yakin ingin menghapus data?')" 
+                                                       title="Hapus">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                    <?php
                                         }
                                     } else {
                                         echo "<tr><td colspan='5' class='text-center'>Data supplier belum ada.</td></tr>";
@@ -141,6 +135,7 @@ if (isset($_GET['hapus'])) {
                     </div>
                 </div>
             </div>
+
             <!-- MEMANGGIL FOOTER -->
             <?php include '../footer.php'; ?>
         </div>
@@ -156,18 +151,21 @@ if (isset($_GET['hapus'])) {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="id_supplier" id="id_supplier">
+                        
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" name="nama_supplier" id="nama_supplier" class="form-control" required>
                                 <label class="form-label">Nama Supplier</label>
                             </div>
                         </div>
+                        
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <textarea name="alamat" id="alamat" class="form-control" rows="3"></textarea>
                                 <label class="form-label">Alamat</label>
                             </div>
                         </div>
+                        
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" name="no_telp" id="no_telp" class="form-control">
@@ -183,38 +181,26 @@ if (isset($_GET['hapus'])) {
             </div>
         </div>
     </div>
+
+    <?php include '../script.php'; ?>
     
-
-    <!-- Jquery Core Js -->
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap Core Js -->
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <!-- Select Plugin Js -->
-    <script src="../AdminBSB/plugins/bootstrap-select/js/bootstrap-select.js"></script>
-    <!-- Slimscroll Plugin Js -->
-    <script src="../AdminBSB/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-    <!-- Waves Effect Plugin Js -->
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <!-- Custom Js -->
-    <script src="../AdminBSB/js/admin.js"></script>
-
     <script>
-    function resetForm() {
-        $('#id_supplier').val('');
-        $('#nama_supplier').val('');
-        $('#alamat').val('');
-        $('#no_telp').val('');
-        $('#modalTitle').text('Tambah Supplier');
-    }
+        function resetForm() {
+            $('#id_supplier').val('');
+            $('#nama_supplier').val('');
+            $('#alamat').val('');
+            $('#no_telp').val('');
+            $('#modalTitle').text('Tambah Supplier');
+        }
 
-    function editData(id, nama, alamat, telp) {
-        $('#id_supplier').val(id);
-        $('#nama_supplier').val(nama);
-        $('#alamat').val(alamat);
-        $('#no_telp').val(telp);
-        $('#modalTitle').text('Edit Supplier');
-        $('#modalSupplier').modal('show');
-    }
+        function editData(id, nama, alamat, telp) {
+            $('#id_supplier').val(id);
+            $('#nama_supplier').val(nama);
+            $('#alamat').val(alamat);
+            $('#no_telp').val(telp);
+            $('#modalTitle').text('Edit Supplier');
+            $('#modalSupplier').modal('show');
+        }
     </script>
 </body>
 

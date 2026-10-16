@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once '../database/koneksi.php';
 
-// Validasi Keamanan
 $authority = @$_SESSION['peran'];
 $is_2fa_passed = @$_SESSION['is_2fa_passed'];
 
@@ -15,20 +14,20 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     exit();
 }
 
-// Ambil ID Menu dari URL
+// ngambil id menu dari url
 $id_menu = isset($_GET['id']) ? mysqli_real_escape_string($con, $_GET['id']) : '';
 
 if (empty($id_menu)) {
-    echo '<script>alert("ID Menu tidak valid!"); window.location.href="index.php";</script>';
+    echo '<script>alert("ID Menu tidak valid!"); window.location.href="../admin_kategori_menu/index.php";</script>';
     exit();
 }
 
-// Ambil data menu utama
+// ngambil data menu utama
 $query_menu = mysqli_query($con, "SELECT * FROM menu WHERE id = '$id_menu'");
 $menu = mysqli_fetch_assoc($query_menu);
 
 if (!$menu) {
-    echo '<script>alert("Data menu tidak ditemukan!"); window.location.href="index.php";</script>';
+    echo '<script>alert("Data menu tidak ditemukan!"); window.location.href="../admin_kategori_menu/index.php";</script>';
     exit();
 }
 
@@ -47,21 +46,29 @@ if (isset($_GET['hapus_resep_id'])) {
 
 // Proses Tambah Bahan Baku yang Sudah Ada ke Resep dari Modal
 if (isset($_POST['tambah_bahan_ke_resep'])) {
-    $bahan_baku_id = mysqli_real_escape_string($con, $_POST['bahan_baku_id']);
-    $jumlah_butuh  = mysqli_real_escape_string($con, $_POST['jumlah_butuh']);
+    $bahan_baku_id  = mysqli_real_escape_string($con, $_POST['bahan_baku_id']);
+    $jumlah_input   = floatval($_POST['jumlah_butuh']);
 
-    if (!empty($bahan_baku_id) && !empty($jumlah_butuh)) {
+    if (!empty($bahan_baku_id) && !empty($jumlah_input)) {
         // Ambil satuan bahan baku dari tabel master
         $q_bb = mysqli_query($con, "SELECT satuan FROM bahan_baku WHERE id = '$bahan_baku_id'");
         $d_bb = mysqli_fetch_assoc($q_bb);
         $satuan = $d_bb['satuan'];
+        $satuan_lower = strtolower(trim($satuan));
+
+        // Konversi dari Gram/ML ke KG/Liter jika satuan dasar di DB adalah kg/liter
+        if ($satuan_lower === 'kg' || $satuan_lower === 'liter' || $satuan_lower === 'l') {
+            $jumlah_simpan = $jumlah_input / 1000;
+        } else {
+            $jumlah_simpan = $jumlah_input;
+        }
 
         // Cek apakah bahan sudah ada di resep ini
         $cek_resep = mysqli_query($con, "SELECT id FROM resep_detail WHERE menu_id = '$id_menu' AND bahan_baku_id = '$bahan_baku_id'");
         if (mysqli_num_rows($cek_resep) > 0) {
-            $insert_rd = mysqli_query($con, "UPDATE resep_detail SET jumlah_butuh = '$jumlah_butuh', satuan = '$satuan' WHERE menu_id = '$id_menu' AND bahan_baku_id = '$bahan_baku_id'");
+            $insert_rd = mysqli_query($con, "UPDATE resep_detail SET jumlah_butuh = '$jumlah_simpan', satuan = '$satuan' WHERE menu_id = '$id_menu' AND bahan_baku_id = '$bahan_baku_id'");
         } else {
-            $insert_rd = mysqli_query($con, "INSERT INTO resep_detail (menu_id, bahan_baku_id, jumlah_butuh, satuan) VALUES ('$id_menu', '$bahan_baku_id', '$jumlah_butuh', '$satuan')");
+            $insert_rd = mysqli_query($con, "INSERT INTO resep_detail (menu_id, bahan_baku_id, jumlah_butuh, satuan) VALUES ('$id_menu', '$bahan_baku_id', '$jumlah_simpan', '$satuan')");
         }
 
         if ($insert_rd) {
@@ -80,9 +87,9 @@ if (isset($_POST['tambah_bahan_baru_dan_resep'])) {
     $nama_bahan   = mysqli_real_escape_string($con, $_POST['nama_bahan']);
     $stok         = mysqli_real_escape_string($con, $_POST['stok']);
     $satuan       = mysqli_real_escape_string($con, $_POST['satuan']);
-    $jumlah_butuh = mysqli_real_escape_string($con, $_POST['jumlah_butuh']);
+    $jumlah_input = floatval($_POST['jumlah_butuh']);
 
-    if (!empty($nama_bahan) && isset($stok) && !empty($satuan) && !empty($jumlah_butuh)) {
+    if (!empty($nama_bahan) && isset($stok) && !empty($satuan) && !empty($jumlah_input)) {
         // 1. Simpan bahan baru ke tabel master bahan_baku
         $insert_bb = mysqli_query($con, "INSERT INTO bahan_baku (nama_bahan, stok, satuan) VALUES ('$nama_bahan', '$stok', '$satuan')");
         
@@ -90,8 +97,16 @@ if (isset($_POST['tambah_bahan_baru_dan_resep'])) {
             // Ambil ID bahan baku yang baru saja dimasukkan
             $bahan_baku_id_baru = mysqli_insert_id($con);
 
+            $satuan_lower = strtolower(trim($satuan));
+            // Konversi jika inputan berbasis gram/ml ke kg/liter
+            if ($satuan_lower === 'kg' || $satuan_lower === 'liter' || $satuan_lower === 'l') {
+                $jumlah_simpan = $jumlah_input / 1000;
+            } else {
+                $jumlah_simpan = $jumlah_input;
+            }
+
             // 2. Masukkan ke tabel resep_detail
-            $insert_rd = mysqli_query($con, "INSERT INTO resep_detail (menu_id, bahan_baku_id, jumlah_butuh, satuan) VALUES ('$id_menu', '$bahan_baku_id_baru', '$jumlah_butuh', '$satuan')");
+            $insert_rd = mysqli_query($con, "INSERT INTO resep_detail (menu_id, bahan_baku_id, jumlah_butuh, satuan) VALUES ('$id_menu', '$bahan_baku_id_baru', '$jumlah_simpan', '$satuan')");
 
             if ($insert_rd) {
                 echo '<script>alert("Bahan baku baru berhasil dibuat dan ditambahkan ke resep!"); window.location.href="edit.php?id=' . $id_menu . '";</script>';
@@ -119,7 +134,7 @@ if (isset($_POST['update'])) {
 
     $gambar_nama = $menu['gambar']; // Default menggunakan gambar lama
 
-    // Penanganan Upload Gambar disesuaikan dengan folder image/
+    // Penanganan Upload Gambar
     if (isset($_FILES['gambar']['name']) && $_FILES['gambar']['name'] != '') {
         $filename   = $_FILES['gambar']['name'];
         $filesize   = $_FILES['gambar']['size'];
@@ -130,14 +145,13 @@ if (isset($_POST['update'])) {
         if (in_array($ext_file, $ext_valid)) {
             if ($filesize <= 2097152) { // Maksimal 2MB
                 $gambar_baru = time() . '_' . uniqid() . '.' . $ext_file;
-                $target_dir  = "../image/"; // Disesuaikan dengan folder 'image' pada struktur proyek
+                $target_dir  = "../image/";
 
                 if (!file_exists($target_dir)) {
                     mkdir($target_dir, 0777, true);
                 }
 
                 if (move_uploaded_file($filetmp, $target_dir . $gambar_baru)) {
-                    // Hapus gambar lama dari server jika ada
                     if (!empty($menu['gambar']) && file_exists($target_dir . $menu['gambar'])) {
                         unlink($target_dir . $menu['gambar']);
                     }
@@ -154,7 +168,7 @@ if (isset($_POST['update'])) {
     }
 
     if (!isset($error)) {
-        // 1. Update tabel menu (Termasuk kolom deskripsi)
+        // 1. Update tabel menu
         $update_menu = mysqli_query($con, "UPDATE menu SET 
                             nama_menu = '$nama_menu', 
                             deskripsi = '$deskripsi',
@@ -170,13 +184,32 @@ if (isset($_POST['update'])) {
             if (isset($_POST['jumlah']) && is_array($_POST['jumlah'])) {
                 foreach ($_POST['jumlah'] as $resep_id => $jumlah_val) {
                     $resep_id_clean = mysqli_real_escape_string($con, $resep_id);
-                    $jumlah_clean   = mysqli_real_escape_string($con, $jumlah_val);
-                    
-                    mysqli_query($con, "UPDATE resep_detail SET jumlah_butuh = '$jumlah_clean' WHERE id = '$resep_id_clean'");
+                    $jumlah_input   = floatval($jumlah_val);
+
+                    // Ambil data bahan baku untuk cek satuan
+                    $q_sat = mysqli_query($con, "
+                        SELECT bahan_baku.satuan 
+                        FROM resep_detail 
+                        JOIN bahan_baku ON resep_detail.bahan_baku_id = bahan_baku.id 
+                        WHERE resep_detail.id = '$resep_id_clean'
+                    ");
+                    if ($q_sat && mysqli_num_rows($q_sat) > 0) {
+                        $d_sat = mysqli_fetch_assoc($q_sat);
+                        $satuan_db = strtolower(trim($d_sat['satuan']));
+
+                        if ($satuan_db === 'kg' || $satuan_db === 'liter' || $satuan_db === 'l') {
+                            $jumlah_simpan = $jumlah_input / 1000;
+                        } else {
+                            $jumlah_simpan = $jumlah_input;
+                        }
+
+                        mysqli_query($con, "UPDATE resep_detail SET jumlah_butuh = '$jumlah_simpan' WHERE id = '$resep_id_clean'");
+                    }
                 }
             }
 
-            echo '<script>alert("Data menu dan resep berhasil diperbarui!"); window.location.href="index.php";</script>';
+            // Redirect ke halaman Daftar Menu
+            echo '<script>alert("Data menu dan resep berhasil diperbarui!"); window.location.href="../admin_kategori_menu/index.php";</script>';
             exit();
         } else {
             $error = "Gagal memperbarui menu: " . mysqli_error($con);
@@ -195,11 +228,7 @@ if (isset($_POST['update'])) {
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
 </head>
 
 <body class="theme-red">
@@ -242,7 +271,6 @@ if (isset($_POST['update'])) {
                                             </div>
                                         </div>
 
-                                        <!-- INPUT DESKRIPSI MENU -->
                                         <div class="form-group form-float">
                                             <div class="form-line focused">
                                                 <textarea name="deskripsi" rows="3" class="form-control no-resize"><?= htmlspecialchars($menu['deskripsi'] ?? ''); ?></textarea>
@@ -279,7 +307,6 @@ if (isset($_POST['update'])) {
                                             </select>
                                         </div>
 
-                                        <!-- INPUT UNTUK GAMBAR MENU -->
                                         <div class="form-group">
                                             <label>Foto / Gambar Menu</label>
                                             <input type="file" name="gambar" id="inputGambar" class="form-control" accept="image/*">
@@ -287,7 +314,6 @@ if (isset($_POST['update'])) {
                                         </div>
                                     </div>
 
-                                    <!-- PREVIEW GAMBAR -->
                                     <div class="col-md-4 text-center">
                                         <label style="display: block; text-align: center;">Preview Gambar</label>
                                         <?php 
@@ -298,98 +324,11 @@ if (isset($_POST['update'])) {
                                     </div>
                                 </div>
 
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h4 class="card-inside-title" style="margin-top: 10px;">2. Daftar Bahan Baku & Takaran Resep</h4>
-                                    </div>
-                                    <div class="col-md-6 text-right">
-                                        <!-- Tombol Pemicu Modal Pilih Bahan yang Ada -->
-                                        <button type="button" class="btn bg-cyan waves-effect btn-sm" data-toggle="modal" data-target="#modalTambahBahan">
-                                            <i class="material-icons">playlist_add</i> <span>PILIH BAHAN ADA</span>
-                                        </button>
-                                        <!-- Tombol Pemicu Modal Buat Bahan Baru -->
-                                        <button type="button" class="btn bg-green waves-effect btn-sm" data-toggle="modal" data-target="#modalTambahBahanBaru">
-                                            <i class="material-icons">add_box</i> <span>BUAT BAHAN BARU</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- SEARCH BAR INPUT -->
-                                <div class="row m-b-15 m-t-10">
-                                    <div class="col-md-4">
-                                        <div class="form-group form-float" style="margin-bottom: 0;">
-                                            <div class="form-line">
-                                                <input type="text" id="searchBahan" class="form-control" placeholder="Cari nama bahan baku...">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- END SEARCH BAR -->
-
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped" id="tabelBahan">
-                                        <thead>
-                                            <tr>
-                                                <th width="5%" class="text-center">No</th>
-                                                <th width="40%">Nama Bahan Baku</th>
-                                                <th width="25%">Jumlah Kebutuhan</th>
-                                                <th width="15%">Satuan</th>
-                                                <th width="15%" class="text-center">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $query_resep = mysqli_query($con, "
-                                                SELECT 
-                                                    resep_detail.id AS resep_id, 
-                                                    resep_detail.jumlah_butuh, 
-                                                    resep_detail.satuan, 
-                                                    bahan_baku.nama_bahan, 
-                                                    bahan_baku.stok 
-                                                FROM resep_detail
-                                                JOIN bahan_baku ON resep_detail.bahan_baku_id = bahan_baku.id
-                                                WHERE resep_detail.menu_id = '$id_menu'
-                                                ORDER BY bahan_baku.nama_bahan ASC
-                                            ");
-
-                                            if (mysqli_num_rows($query_resep) > 0) {
-                                                $no = 1;
-                                                while ($rd = mysqli_fetch_assoc($query_resep)) {
-                                            ?>
-                                                    <tr class="bahan-row">
-                                                        <td class="text-center"><?= $no++; ?></td>
-                                                        <td class="nama-bahan">
-                                                            <strong><?= htmlspecialchars($rd['nama_bahan']); ?></strong> 
-                                                            <small class="text-muted">(Stok: <?= $rd['stok'] . ' ' . $rd['satuan']; ?>)</small>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" step="0.01" name="jumlah[<?= $rd['resep_id']; ?>]" class="form-control input-sm" placeholder="Contoh: 0.15" value="<?= $rd['jumlah_butuh']; ?>" required>
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control input-sm" value="<?= $rd['satuan']; ?>" readonly>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <a href="edit.php?id=<?= $id_menu; ?>&hapus_resep_id=<?= $rd['resep_id']; ?>" class="btn btn-danger btn-xs waves-effect" onclick="return confirm('Hapus <?= htmlspecialchars($rd['nama_bahan']); ?> dari resep menu ini?');" title="Hapus dari Resep">
-                                                                <i class="material-icons" style="font-size: 16px;">delete</i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                            <?php 
-                                                }
-                                            } else {
-                                                echo '<tr><td colspan="5" class="text-center text-muted">Belum ada bahan baku yang ditambahkan ke resep ini.</td></tr>';
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-
                                 <button type="submit" name="update" class="btn btn-primary m-t-15 waves-effect">
                                     <i class="material-icons">save</i>
                                     <span>SIMPAN MENU</span>
                                 </button>
-                                <a href="index.php" class="btn btn-default m-t-15 waves-effect">
+                                <a href="../admin_kategori_menu/index.php" class="btn btn-default m-t-15 waves-effect">
                                     <i class="material-icons">arrow_back</i>
                                     <span>KEMBALI</span>
                                 </a>
@@ -424,7 +363,7 @@ if (isset($_POST['update'])) {
                         </div>
                         <div class="form-group form-float m-t-20">
                             <div class="form-line">
-                                <input type="number" step="0.01" name="jumlah_butuh" class="form-control" required>
+                                <input type="number" step="0.01" name="jumlah_butuh" class="form-control" required placeholder="Isi takaran (contoh: 50 untuk 50 gram)">
                                 <label class="form-label">Jumlah Kebutuhan Takaran</label>
                             </div>
                         </div>
@@ -437,7 +376,6 @@ if (isset($_POST['update'])) {
             </div>
         </div>
     </div>
-    <!-- END MODAL 1 -->
 
     <!-- MODAL 2: TAMBAH BAHAN BAKU BARU -->
     <div class="modal fade" id="modalTambahBahanBaru" tabindex="-1" role="dialog">
@@ -461,7 +399,7 @@ if (isset($_POST['update'])) {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Satuan</label>
+                            <label>Satuan Stok Utama</label>
                             <select name="satuan" class="form-control show-tick" required>
                                 <option value="">-- Pilih Satuan --</option>
                                 <option value="kg">Kilogram (kg)</option>
@@ -475,7 +413,7 @@ if (isset($_POST['update'])) {
                         </div>
                         <div class="form-group form-float m-t-15">
                             <div class="form-line">
-                                <input type="number" step="0.01" name="jumlah_butuh" class="form-control" required>
+                                <input type="number" step="0.01" name="jumlah_butuh" class="form-control" required placeholder="Isi takaran (contoh: 50 untuk 50 gram)">
                                 <label class="form-label">Jumlah Kebutuhan untuk Resep Ini</label>
                             </div>
                         </div>
@@ -488,13 +426,8 @@ if (isset($_POST['update'])) {
             </div>
         </div>
     </div>
-    <!-- END MODAL 2 -->
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
-    <script src="../AdminBSB/js/pages/forms/basic-form-elements.js"></script>
+    <?php include '../script.php'; ?>
 
     <script>
         $(document).ready(function(){
@@ -516,7 +449,7 @@ if (isset($_POST['update'])) {
                 }
             });
 
-            // Live Preview Gambar yang Dipilih
+            // Live Preview Gambar
             $("#inputGambar").change(function() {
                 if (this.files && this.files[0]) {
                     var reader = new FileReader();

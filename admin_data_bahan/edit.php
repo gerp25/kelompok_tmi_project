@@ -129,9 +129,7 @@ if (isset($_POST['update'])) {
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
+    <?php include '../script.php'; ?>
+    
 </body>
 </html>

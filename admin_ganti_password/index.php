@@ -133,7 +133,7 @@ if (isset($_POST['btn_simpan'])) {
 
                                 <button type="submit" name="btn_simpan" class="btn btn-primary m-t-15 waves-effect">
                                     <i class="material-icons">save</i>
-                                    <span>SIMPAN PERUBAHAN</span>
+                                    <span>SIMPAN</span>
                                 </button>
                             </form>
                         </div>
@@ -148,7 +148,21 @@ if (isset($_POST['btn_simpan'])) {
 
     <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
     <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
+    <!-- Tambahkan plugin SlimScroll -->
+    <script src="../AdminBSB/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
     <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
     <script src="../AdminBSB/js/admin.js"></script>
+
+    <!-- Inisialisasi SlimScroll untuk sidebar -->
+    <script>
+        $(function () {
+            $('.sidebar .list').slimScroll({
+                height: 'calc(100vh - 100px)',
+                color: 'rgba(0,0,0,0.5)',
+                size: '4px',
+                alwaysVisible: false
+            });
+        });
+    </script>
 </body>
 </html>

@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once '../database/koneksi.php';
 
-// Validasi Keamanan
 $authority = @$_SESSION['peran'];
 $is_2fa_passed = @$_SESSION['is_2fa_passed'];
 
@@ -47,12 +46,42 @@ if (isset($_POST['simpan'])) {
     }
 
     if (!isset($error)) {
-        // Masukkan data ke tabel menu beserta deskripsi dan nama file gambar
+        // 1. Masukkan data ke tabel menu
         $query_insert_menu = mysqli_query($con, "INSERT INTO menu (kategori_id, nama_menu, harga, deskripsi, status, gambar, created_at, updated_at) 
                                                  VALUES ('$kategori_id', '$nama_menu', '$harga', '$deskripsi', '$status', '$nama_gambar', '$created_at', '$updated_at')");
 
         if ($query_insert_menu) {
-            echo '<script>alert("Menu baru berhasil ditambahkan!"); window.location.href="index.php";</script>';
+            $id_menu_baru = mysqli_insert_id($con);
+
+            // 2. Proses Simpan Detail Resep/Bahan Baku (jika ada input bahan baku)
+            if (isset($_POST['id_bahan']) && is_array($_POST['id_bahan'])) {
+                foreach ($_POST['id_bahan'] as $index => $id_bahan) {
+                    $id_bahan_clean = mysqli_real_escape_string($con, $id_bahan);
+                    $jumlah_input   = floatval($_POST['jumlah_kebutuhan'][$index]);
+
+                    // Cek satuan dasar dari tabel bahan
+                    $q_satuan = mysqli_query($con, "SELECT satuan FROM bahan WHERE id_bahan = '$id_bahan_clean'");
+                    if ($q_satuan && mysqli_num_rows($q_satuan) > 0) {
+                        $dt_satuan = mysqli_fetch_assoc($q_satuan);
+                        $satuan_db = strtolower(trim($dt_satuan['satuan']));
+
+                        // Jika satuan dasar adalah kg atau liter, bagi 1000 agar nilai tersimpan sesuai standar stok DB
+                        if ($satuan_db === 'kg' || $satuan_db === 'liter' || $satuan_db === 'l') {
+                            $jumlah_simpan = $jumlah_input / 1000;
+                        } else {
+                            $jumlah_simpan = $jumlah_input;
+                        }
+
+                        // Simpan ke detail resep
+                        mysqli_query($con, "INSERT INTO detail_resep (menu_id, bahan_id, jumlah_kebutuhan) 
+                                           VALUES ('$id_menu_baru', '$id_bahan_clean', '$jumlah_simpan')");
+                    }
+                }
+            }
+
+            // Arahkan kembali ke halaman Daftar Menu
+            echo '<script>alert("Menu baru berhasil ditambahkan!"); window.location.href="../admin_kategori_menu/index.php";</script>';
+            exit();
         } else {
             $error = "Gagal menambahkan menu: " . mysqli_error($con);
         }
@@ -70,11 +99,7 @@ if (isset($_POST['simpan'])) {
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
 </head>
 
 <body class="theme-red">
@@ -150,7 +175,7 @@ if (isset($_POST['simpan'])) {
                                     <i class="material-icons">save</i>
                                     <span>SIMPAN MENU</span>
                                 </button>
-                                <a href="index.php" class="btn btn-default m-t-15 waves-effect">
+                                <a href="../admin_kategori_menu/index.php" class="btn btn-default m-t-15 waves-effect">
                                     <i class="material-icons">arrow_back</i>
                                     <span>KEMBALI</span>
                                 </a>
@@ -162,10 +187,6 @@ if (isset($_POST['simpan'])) {
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
-    <script src="../AdminBSB/js/pages/forms/basic-form-elements.js"></script>
+    <?php include '../script.php'; ?>
 </body>
 </html>
