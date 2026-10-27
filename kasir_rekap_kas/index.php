@@ -128,7 +128,7 @@ $result_detail = mysqli_query($con, $query_detail);
                                     <strong class="pull-right">Rp <?= number_format($data_rekap['total_tunai'] ?? 0, 0, ',', '.'); ?></strong>
                                 </li>
                                 <li class="list-group-item">
-                                    <span>Non-Tunai (QRIS/EDC)</span>
+                                    <span>Non-Tunai (Transfer)</span>
                                     <strong class="pull-right">Rp <?= number_format($data_rekap['total_nontunai'] ?? 0, 0, ',', '.'); ?></strong>
                                 </li>
                                 <li class="list-group-item list-group-item-info">

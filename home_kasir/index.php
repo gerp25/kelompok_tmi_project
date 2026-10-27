@@ -50,21 +50,122 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
                 <h2>DASHBOARD KASIR</h2>
             </div>
 
-            <!-- KONTEN UTAMA DASBOR KASIR -->
+            <!-- WIDGET INFO BOX ATAS -->
             <div class="row clearfix">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="card">
-                        <div class="header">
-                            <h2>SELAMAT DATANG</h2>
-                            <small>Panel Transaksi Kasir Bakul Sega Bu Lastri</small>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box bg-pink hover-expand-effect">
+                        <div class="icon">
+                            <i class="material-icons">attach_money</i>
                         </div>
-                        <div class="body">
-                            <h4>Halo, <?= htmlspecialchars($user_display); ?>!</h4>
-                            <p>Anda telah sukses terhubung ke Panel Kasir <b>Bakul Sega Bu Lastri</b>. Silakan gunakan menu di samping untuk memproses transaksi penjualan.</p>
+                        <div class="content">
+                            <div class="text">PENJUALAN HARI INI</div>
+                            <div class="number">Rp 0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box bg-cyan hover-expand-effect">
+                        <div class="icon">
+                            <i class="material-icons">shopping_cart</i>
+                        </div>
+                        <div class="content">
+                            <div class="text">TRANSAKSI HARI INI</div>
+                            <div class="number">0 Nota</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box bg-light-green hover-expand-effect">
+                        <div class="icon">
+                            <i class="material-icons">trending_up</i>
+                        </div>
+                        <div class="content">
+                            <div class="text">TOTAL PENJUALAN BULAN INI</div>
+                            <div class="number">Rp 6.000</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box bg-orange hover-expand-effect">
+                        <div class="icon">
+                            <i class="material-icons">restaurant_menu</i>
+                        </div>
+                        <div class="content">
+                            <div class="text">MENU TERSEDIA</div>
+                            <div class="number">2 Item</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- KONTEN UTAMA: TABEL TRANSAKSI & MENU TERLARIS -->
+            <div class="row clearfix">
+                <!-- Tabel Transaksi Terbaru -->
+                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+                    <div class="card">
+                        <div class="header">
+                            <h2>TRANSAKSI PENJUALAN TERBARU</h2>
+                        </div>
+                        <div class="body">
+                            <div class="table-responsive">
+                                <table class="table table-hover dashboard-task-infos">
+                                    <thead>
+                                        <tr>
+                                            <th>No. Nota</th>
+                                            <th>Tanggal</th>
+                                            <th>Tipe</th>
+                                            <th>Metode</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>NOTA-20261013-0001</td>
+                                            <td>13/10/2026 12:22</td>
+                                            <td><span class="label bg-blue">Ditempat</span></td>
+                                            <td><span class="label bg-light-green">Tunai</span></td>
+                                            <td>Rp 6.000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>NOTA-20260929-0001</td>
+                                            <td>29/09/2026 11:42</td>
+                                            <td><span class="label bg-blue">Ditempat</span></td>
+                                            <td><span class="label bg-light-green">Tunai</span></td>
+                                            <td>Rp 200.000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Menu Terlaris -->
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                    <div class="card">
+                        <div class="header">
+                            <h2>MENU TERLARIS</h2>
+                        </div>
+                        <div class="body">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    Gudeg 
+                                    <span class="badge bg-teal">20 porsi</span>
+                                </li>
+                                <li class="list-group-item">
+                                    Oseng Gambas 
+                                    <span class="badge bg-teal">1 porsi</span>
+                                </li>
+                                <li class="list-group-item">
+                                    Oseng Kangkung 
+                                    <span class="badge bg-teal">1 porsi</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SELESAI KONTEN UTAMA -->
 
             <?php include '../footer.php'; ?>
 

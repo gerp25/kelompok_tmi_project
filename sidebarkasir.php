@@ -63,8 +63,7 @@ $current_script = $_SERVER['SCRIPT_NAME'];
                 </a>
             </li>
 
-            <!-- Rekap Shift Harian -->
-            <li class="<?= (basename($current_script) == 'rekap_shift.php') ? 'active' : ''; ?>">
+            <li class="<?= (strpos($current_script, 'kasir_rekap_kas') !== false) ? 'active' : ''; ?>">
                 <a href="../kasir_rekap_kas/">
                     <i class="material-icons">today</i>
                     <span>Rekap Kas Harian</span>
