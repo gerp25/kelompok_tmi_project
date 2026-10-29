@@ -76,15 +76,7 @@ if (isset($_POST['login'])) {
             <button class="btn btn-danger btn-block btn-lg" type="submit" name="login" style="background-color:#bb0a1e; margin-top: 20px;">
               <font color="#ffffff"><b>Masuk</b></font>
             </button>
-            
-            <br>
-            <div class="text-center">
-              <a href="../daftar_akun/" class="nav-link">
-                <font color="#000000">Belum punya akun?</font> <font color="blue">Daftar</font>
-              </a>
-            </div>
-
-            <br>
+        
 
             <div class="text-center">
               <img src="../image/font_logo.png" class="footer-logo" style="width:180px; height:auto; object-fit:contain;" alt="Resto Logo"/>

@@ -102,7 +102,6 @@ if ($query_menu && mysqli_num_rows($query_menu) > 0) {
                                             <th>Nama Menu</th>
                                             <th>ID Kategori</th>
                                             <th>Harga</th>
-                                            <th>Stok Tersedia</th>
                                             <th>Status Stok</th>
                                         </tr>
                                     </thead>
@@ -127,13 +126,13 @@ if ($query_menu && mysqli_num_rows($query_menu) > 0) {
                                             <td><strong><?= htmlspecialchars($menu['nama_menu']); ?></strong></td>
                                             <td><?= htmlspecialchars($kategori_id); ?></td>
                                             <td>Rp <?= number_format($harga, 0, ',', '.'); ?></td>
-                                            <td><strong>-</strong></td>
                                             <td><?= $status_badge; ?></td>
                                         </tr>
                                         <?php 
                                             }
                                         } else {
-                                            echo "<tr><td colspan='6' class='text-center'>Data menu tidak ditemukan.</td></tr>";
+                                            // Colspan diubah dari 6 menjadi 5 karena satu kolom dihapus
+                                            echo "<tr><td colspan='5' class='text-center'>Data menu tidak ditemukan.</td></tr>";
                                         }
                                         ?>
                                     </tbody>
