@@ -138,9 +138,11 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
                                             <th>No</th>
                                             <th>No. Nota</th>
                                             <th>Tanggal & Waktu</th>
+                                            <th>Pemesan</th>
                                             <th>Tipe Pesanan</th>
                                             <th>Total Harga</th>
                                             <th>Metode Bayar</th>
+                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -151,27 +153,65 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
                                             foreach ($data_penjualan as $penjualan) {
                                                 $total_harga = isset($penjualan['total_harga']) ? $penjualan['total_harga'] : 0;
                                                 $tipe = !empty($penjualan['tipe_pesanan']) ? $penjualan['tipe_pesanan'] : '-';
+                                                
+                                                // Logika pengambilan nama pemesan
+                                                $pemesan = !empty($penjualan['nama_pelanggan']) ? htmlspecialchars($penjualan['nama_pelanggan']) : '<i>(Walk-in)</i>';
                                         ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
                                             <td><strong><?= htmlspecialchars($penjualan['no_nota']); ?></strong></td>
-                                            <td><?= date('d-m-Y H:i:s', strtotime($penjualan['tanggal'])); ?></td>
+                                            <td><?= date('d-m-Y H:i', strtotime($penjualan['tanggal'])); ?></td>
+                                            
+                                            <td><?= $pemesan; ?></td>
+                                            
                                             <td><span class="label bg-cyan"><?= htmlspecialchars($tipe); ?></span></td>
                                             <td>Rp <?= number_format($total_harga, 0, ',', '.'); ?></td>
-                                            <td><span class="label bg-teal"><?= htmlspecialchars($penjualan['metode_bayar']); ?></span></td>
-                                            <td>
+                                            
+                                            <td><?= htmlspecialchars($penjualan['metode_bayar']); ?></td>
+                                            
+                                            <!-- Menampilkan kolom Status -->
+                                            <?php
+                                                // Cek kolom status_pesanan atau status di database
+                                                $status_pesanan = '-';
+                                                if (!empty($penjualan['status_pesanan'])) {
+                                                    $status_pesanan = $penjualan['status_pesanan'];
+                                                } elseif (!empty($penjualan['status'])) {
+                                                    $status_pesanan = $penjualan['status'];
+                                                }
+                                                
+                                                // Penentuan warna label
+                                                $label_warna = 'bg-grey';
+                                                $status_lower = strtolower($status_pesanan);
+                                                
+                                                if ($status_lower == 'diproses' || $status_lower == 'di proses') {
+                                                    $label_warna = 'bg-orange';
+                                                } elseif ($status_lower == 'selesai') {
+                                                    $label_warna = 'bg-green';
+                                                } elseif ($status_lower == 'menunggu konfirmasi') {
+                                                    $label_warna = 'bg-blue';
+                                                } elseif ($status_lower == 'batal' || $status_lower == 'dibatalkan') {
+                                                    $label_warna = 'bg-red';
+                                                }
+                                            ?>
+                                            <td><span class="label <?= $label_warna; ?>"><?= htmlspecialchars($status_pesanan); ?></span></td>
+                                            
+                                            <td style="white-space: nowrap;">
                                                 <a href="detail_transaksi.php?id=<?= $penjualan['id_penjualan']; ?>" class="btn btn-xs btn-info waves-effect" title="Lihat Detail">
                                                     <i class="material-icons">visibility</i>
                                                 </a>
                                                 <a href="cetak_nota.php?id=<?= $penjualan['id_penjualan']; ?>" target="_blank" class="btn btn-xs btn-success waves-effect" title="Cetak Ulang Nota">
                                                     <i class="material-icons">print</i>
                                                 </a>
+                                                
+                                                <a href="hapus.php?nota=<?= urlencode($penjualan['no_nota']); ?>" class="btn btn-xs btn-danger waves-effect" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?');" title="Hapus">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
                                             </td>
                                         </tr>
                                         <?php 
                                             }
                                         } else {
-                                            echo "<tr><td colspan='7' class='text-center'>Belum ada riwayat transaksi.</td></tr>";
+                                            echo "<tr><td colspan='9' class='text-center'>Belum ada riwayat transaksi.</td></tr>";
                                         }
                                         ?>
                                     </tbody>

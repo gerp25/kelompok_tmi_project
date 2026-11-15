@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once '../database/koneksi.php';
 
-// Pastikan pengguna sudah login
 if (!isset($_SESSION['username'])) {
     echo '<script>alert("Silakan login terlebih dahulu."); window.location.href="../index.php";</script>';
     exit();
@@ -20,7 +19,7 @@ if (isset($_POST['btn_simpan'])) {
     $sandi_baru = $_POST['sandi_baru'];
     $konfirmasi_sandi = $_POST['konfirmasi_sandi'];
 
-    // Ambil sandi pengguna saat ini dari database
+    // buat ngambil sandi si user dari db
     $query = mysqli_query($con, "SELECT sandi FROM tbl_user WHERE username = '" . mysqli_real_escape_string($con, $username_session) . "'");
     $data = mysqli_fetch_assoc($query);
 
@@ -28,7 +27,6 @@ if (isset($_POST['btn_simpan'])) {
         $db_sandi = $data['sandi'];
         $sandi_lama_valid = false;
 
-        // Verifikasi dengan SHA1
         if (sha1($sandi_lama) === $db_sandi) {
             $sandi_lama_valid = true;
         }
@@ -43,7 +41,7 @@ if (isset($_POST['btn_simpan'])) {
             $pesan = 'Password baru minimal 4 karakter!';
             $tipe_pesan = 'warning';
         } else {
-            // Encrypt password baru menggunakan SHA1
+            // buat pswt baru
             $sandi_baru_hashed = sha1($sandi_baru);
             $update = mysqli_query($con, "UPDATE tbl_user SET sandi = '$sandi_baru_hashed' WHERE username = '" . mysqli_real_escape_string($con, $username_session) . "'");
 
@@ -69,11 +67,8 @@ if (isset($_POST['btn_simpan'])) {
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
+
 </head>
 
 <body class="theme-red">
@@ -92,7 +87,6 @@ if (isset($_POST['btn_simpan'])) {
             </div>
 
             <div class="row clearfix">
-                <!-- Ubah class di baris bawah ini menjadi col-xs-12 col-sm-12 col-md-12 col-lg-12 -->
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="card">
                         <div class="header">
@@ -146,14 +140,9 @@ if (isset($_POST['btn_simpan'])) {
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <!-- Tambahkan plugin SlimScroll -->
-    <script src="../AdminBSB/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
+    <?php include '../script.php'; ?>
 
-    <!-- Inisialisasi SlimScroll untuk sidebar -->
+    <!-- supaya scrol di sidebar nya enak aja -->
     <script>
         $(function () {
             $('.sidebar .list').slimScroll({

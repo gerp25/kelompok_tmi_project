@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 16 Okt 2026 pada 09.37
+-- Waktu pembuatan: 15 Nov 2026 pada 15.56
 -- Versi server: 11.8.1-MariaDB
 -- Versi PHP: 8.1.1
 
@@ -127,29 +127,28 @@ CREATE TABLE `menu` (
 --
 
 INSERT INTO `menu` (`id`, `kategori_id`, `nama_menu`, `harga`, `deskripsi`, `foto`, `status`, `gambar`, `created_at`, `updated_at`) VALUES
-(30, 1, 'Nasi Rames', '10000.00', 'Nasi putih hangat disajikan dengan aneka lauk gurih khas rumahan. Dilengkapi setengah butir telur bacem, tongkol balado kemangi, bihun goreng, soun tumis, dan orek tempe manis gurih. Porsi kenyang dan pas untuk makan siang!', NULL, 'tersedia', '1790047319_6ab1f457075c2.png', '2026-09-22 03:21:59', '2026-10-13 05:18:53'),
-(33, 1, 'Nasi Liwet', '8000.00', 'Nasi liwet gurih khas sajian Bu Lastri dengan aroma rempah pilihan.', NULL, 'tersedia', '', '2026-09-24 03:59:37', '2026-10-13 05:18:56'),
-(34, 1, 'Nasi Gudeg', '10000.00', 'Nasi putih disajikan dengan gudeg khas yang manis dan gurih.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(35, 1, 'Nasi Kuning', '8000.00', 'Nasi kuning rempah gurih disajikan hangat.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(36, 1, 'Nasi Uduk', '8000.00', 'Nasi uduk santan gurih beraroma harum pandan dan serai.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(37, 1, 'Nasi Tongkol', '10000.00', 'Nasi putih disajikan dengan olahan olahan tongkol gurih khas.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(38, 2, 'Gudeg', '10000.00', 'Olahan nangka muda manis gurih khas sajian rumahan.', NULL, 'habis', '1790234890_6ab4d10aa814f.jpeg', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(39, 2, 'Opor Ayam Suwir', '6000.00', 'Ayam suwir empuk dimasak bumbu opor santan gurih.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(40, 2, 'Tahu Opor', '3000.00', 'Potongan tahu lembut dimasak kuah opor santan gurih.', NULL, 'habis', '1790578854_6aba10a6989fb.webp', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(41, 2, 'Sambel Goreng Tempe', '3000.00', 'Tempe potong dadu yang dimasak tumis bumbu sambal goreng gurih.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(42, 2, 'Kering Tempe', '4000.00', 'Irisan tempe renyah dimasak bumbu manis gurih tahan lama.', NULL, 'habis', '1790239831_6ab4e457affcd.png', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(43, 2, 'Telor Pindang', '4000.00', 'Telur rebus yang dimasak bumbu pindang kecokelatan yang meresap.', NULL, 'habis', '1790578955_6aba110b4ac0e.jpg', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(44, 2, 'Oseng Waluh', '3000.00', 'Tumisan labu siam / waluh iris bumbu gurih lezat.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(45, 2, 'Sambel Goreng Kentang', '4000.00', 'Potongan kentang dadu dimasak dengan balutan bumbu sambal goreng.', NULL, 'habis', '1790579784_6aba14482ddae.jpg', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(46, 2, 'Oseng Ceriwis', '3000.00', 'Tumis sayur ceriwis segar bumbu gurih pedas manis.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(47, 2, 'Oseng Buncis', '3000.00', 'Oseng buncis segar ditumis renyah dengan bumbu rumahan.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(48, 2, 'Oseng Gori', '3000.00', 'Tumisan gori / nangka muda bumbu oseng lezat.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(49, 2, 'Oseng Kangkung', '3000.00', 'Kangkung segar ditumis dengan bumbu pedas gurih nikmat.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(50, 2, 'Oseng Gambas', '3000.00', 'Tumis gambas / oyong segar bumbu gurih bening.', NULL, 'habis', '', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(51, 2, 'Balado Telor', '5000.00', 'Telur rebus digoreng lalu dilumuri bumbu balado cabai merah.', NULL, 'habis', '1790222970_6ab4a27af24be.jpg', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(52, 2, 'Sambel Tongkol', '6000.00', 'Potongan ikan tongkol masak tumis bumbu sambal pedas gurih.', NULL, 'habis', '1790579876_6aba14a4dfbce.webp', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(53, 2, 'Tahu Merah', '3000.00', 'Tahu goreng berbumbu balado merah pedas gurih.', NULL, 'habis', '1790578786_6aba106279694.webp', '2026-09-24 03:59:37', '2026-10-13 05:18:49'),
-(54, 6, 'es teh', '4000.00', 'es teh enak', NULL, 'habis', '1790668543_6abb6effcde53.jpg', '2026-09-29 07:55:43', '2026-10-13 05:18:49');
+(30, 1, 'Nasi Rames', '10000.00', 'Nasi putih hangat disajikan dengan aneka lauk gurih khas rumahan. Dilengkapi setengah butir telur bacem, tongkol balado kemangi, bihun goreng, soun tumis, dan orek tempe manis gurih. Porsi kenyang dan pas untuk makan siang!', NULL, 'tersedia', '1790047319_6ab1f457075c2.png', '2026-09-22 03:21:59', '2026-10-30 12:42:19'),
+(33, 1, 'Nasi Liwet', '8000.00', 'Nasi liwet gurih khas sajian Bu Lastri dengan aroma rempah pilihan.', NULL, 'habis', '1793077586_6ae0315204978.png', '2026-09-24 03:59:37', '2026-11-05 00:43:29'),
+(34, 1, 'Nasi Gudeg', '10000.00', 'Nasi putih disajikan dengan gudeg khas yang manis dan gurih.', NULL, 'tersedia', '1793077791_6ae0321f0e60f.webp', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(35, 1, 'Nasi Kuning', '8000.00', 'Nasi kuning rempah gurih disajikan hangat.', NULL, 'tersedia', '1793238778_6ae2a6faaae58.jpeg', '2026-09-24 03:59:37', '2026-10-29 06:24:23'),
+(36, 1, 'Nasi Uduk', '8000.00', 'Nasi uduk santan gurih beraroma harum pandan dan serai.', NULL, 'tersedia', '', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(37, 1, 'Nasi Tongkol', '10000.00', 'Nasi putih disajikan dengan olahan olahan tongkol gurih khas.', NULL, 'tersedia', '', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(38, 2, 'Gudeg', '10000.00', 'Olahan nangka muda manis gurih khas sajian rumahan.', NULL, 'tersedia', '1790234890_6ab4d10aa814f.jpeg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(39, 2, 'Opor Ayam Suwir', '6000.00', 'Ayam suwir empuk dimasak bumbu opor santan gurih.', NULL, 'tersedia', '1793080028_6ae03adcdade4.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(40, 2, 'Tahu Opor', '3000.00', 'Potongan tahu lembut dimasak kuah opor santan gurih.', NULL, 'tersedia', '1790578854_6aba10a6989fb.webp', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(41, 2, 'Sambel Goreng Tempe', '3000.00', 'Tempe potong dadu yang dimasak tumis bumbu sambal goreng gurih.', NULL, 'tersedia', '1793079683_6ae0398362cae.jpeg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(42, 2, 'Kering Tempe', '4000.00', 'Irisan tempe renyah dimasak bumbu manis gurih tahan lama.', NULL, 'tersedia', '1790239831_6ab4e457affcd.png', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(43, 2, 'Telor Pindang', '4000.00', 'Telur rebus yang dimasak bumbu pindang kecokelatan yang meresap.', NULL, 'tersedia', '1790578955_6aba110b4ac0e.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(44, 2, 'Oseng Waluh', '3000.00', 'Tumisan labu siam / waluh iris bumbu gurih lezat.', NULL, 'tersedia', '1793079237_6ae037c5aa7f7.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(45, 2, 'Sambel Goreng Kentang', '4000.00', 'Potongan kentang dadu dimasak dengan balutan bumbu sambal goreng.', NULL, 'tersedia', '1790579784_6aba14482ddae.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(46, 2, 'Oseng Ceriwis', '3000.00', 'Tumis sayur ceriwis segar bumbu gurih pedas manis.', NULL, 'tersedia', '1793080784_6ae03dd0bbb6f.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(47, 2, 'Oseng Buncis', '3000.00', 'Oseng buncis segar ditumis renyah dengan bumbu rumahan.', NULL, 'tersedia', '1793078455_6ae034b786b5c.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(48, 2, 'Oseng Gori', '3000.00', 'Tumisan gori / nangka muda bumbu oseng lezat.', NULL, 'tersedia', '1793078250_6ae033ea1d306.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(49, 2, 'Oseng Kangkung', '3000.00', 'Kangkung segar ditumis dengan bumbu pedas gurih nikmat.', NULL, 'tersedia', '1793078018_6ae0330250cc1.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(50, 2, 'Oseng Gambas', '3000.00', 'Tumis gambas / oyong segar bumbu gurih bening.', NULL, 'tersedia', '1793079594_6ae0392a2ab7c.png', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(51, 2, 'Balado Telor', '5000.00', 'Telur rebus digoreng lalu dilumuri bumbu balado cabai merah.', NULL, 'tersedia', '1790222970_6ab4a27af24be.jpg', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(52, 2, 'Sambel Tongkol', '6000.00', 'Potongan ikan tongkol masak tumis bumbu sambal pedas gurih.', NULL, 'tersedia', '1790579876_6aba14a4dfbce.webp', '2026-09-24 03:59:37', '2026-10-30 13:06:00'),
+(53, 2, 'Tahu Merah', '3000.00', 'Tahu goreng berbumbu balado merah pedas gurih.', NULL, 'tersedia', '1790578786_6aba106279694.webp', '2026-09-24 03:59:37', '2026-10-30 13:06:00');
 
 -- --------------------------------------------------------
 
@@ -171,8 +170,7 @@ CREATE TABLE `pembelian` (
 --
 
 INSERT INTO `pembelian` (`id_pembelian`, `no_faktur`, `tgl_pembelian`, `id_supplier`, `total_harga`, `keterangan`) VALUES
-(27, 'TRSUP-20260929105221', '2026-09-29', 1, '1500000.00', 'bahan masakan, dan operasional hari itu\r\n'),
-(33, 'TRSUP-20260930151753', '2026-09-30', NULL, '100000.00', 'bahan');
+(34, 'TRSUP-20261029132106', '2026-10-29', 1, '500000.00', 'Beli bahan, Operasional dan Upah Kerja');
 
 -- --------------------------------------------------------
 
@@ -204,16 +202,19 @@ CREATE TABLE `penjualan` (
   `bayar` decimal(12,2) NOT NULL DEFAULT 0.00,
   `kembali` decimal(12,2) NOT NULL DEFAULT 0.00,
   `metode_bayar` varchar(30) NOT NULL DEFAULT 'Tunai',
-  `id_pengguna` int(11) DEFAULT NULL
+  `id_pengguna` int(11) DEFAULT NULL,
+  `nama_pelanggan` varchar(100) DEFAULT NULL,
+  `keterangan_lokasi` text DEFAULT NULL,
+  `bukti_transfer` varchar(255) DEFAULT NULL,
+  `status_pesanan` varchar(50) DEFAULT 'Selesai'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Dumping data untuk tabel `penjualan`
 --
 
-INSERT INTO `penjualan` (`id_penjualan`, `no_nota`, `tanggal`, `tipe_pesanan`, `total_harga`, `bayar`, `kembali`, `metode_bayar`, `id_pengguna`) VALUES
-(13, 'NOTA-20260929-0001', '2026-09-29 11:42:00', 'Ditempat', '200000.00', '200000.00', '0.00', 'Tunai', NULL),
-(17, 'NOTA-20261013-0001', '2026-10-13 12:22:00', 'Ditempat', '6000.00', '6000.00', '0.00', 'Tunai', NULL);
+INSERT INTO `penjualan` (`id_penjualan`, `no_nota`, `tanggal`, `tipe_pesanan`, `total_harga`, `bayar`, `kembali`, `metode_bayar`, `id_pengguna`, `nama_pelanggan`, `keterangan_lokasi`, `bukti_transfer`, `status_pesanan`) VALUES
+(46, 'NOTA-20261112073803', '2026-11-12 07:38:03', 'Dikirim', '10000.00', '10000.00', '0.00', 'Transfer', NULL, 'Ian ', 'Pagojengan', 'NOTA-20261112073803.jpg', 'Diproses');
 
 -- --------------------------------------------------------
 
@@ -235,9 +236,7 @@ CREATE TABLE `penjualan_detail` (
 --
 
 INSERT INTO `penjualan_detail` (`id_detail`, `no_nota`, `id_menu`, `harga`, `jumlah`, `subtotal`) VALUES
-(12, 'NOTA-20260929-0001', 38, '10000.00', 20, '200000.00'),
-(15, 'NOTA-20261013-0001', 49, '3000.00', 1, '3000.00'),
-(16, 'NOTA-20261013-0001', 50, '3000.00', 1, '3000.00');
+(46, 'NOTA-20261112073803', 34, '10000.00', 1, '10000.00');
 
 -- --------------------------------------------------------
 
@@ -385,13 +384,13 @@ ALTER TABLE `kategori_menu`
 -- AUTO_INCREMENT untuk tabel `menu`
 --
 ALTER TABLE `menu`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT untuk tabel `pembelian`
 --
 ALTER TABLE `pembelian`
-  MODIFY `id_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT untuk tabel `pembelian_detail`
@@ -403,13 +402,13 @@ ALTER TABLE `pembelian_detail`
 -- AUTO_INCREMENT untuk tabel `penjualan`
 --
 ALTER TABLE `penjualan`
-  MODIFY `id_penjualan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_penjualan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT untuk tabel `penjualan_detail`
 --
 ALTER TABLE `penjualan_detail`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT untuk tabel `resep_detail`

@@ -14,7 +14,7 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     exit();
 }
 
-// buat nyimpan semua data ke array
+// Ambil semua data penjualan terbaru
 $data_penjualan = [];
 $query_penjualan = mysqli_query($con, "SELECT * FROM penjualan ORDER BY tanggal DESC");
 
@@ -32,15 +32,12 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title>Data Penjualan - Bakul Sega Bu Lastri</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
-
     <?php include '../css.php'; ?>
 </head>
 
 <body class="theme-red">
-    <!-- Top Bar -->
     <nav class="navbar">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -51,7 +48,6 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
         </div>
     </nav>
 
-    <!-- Left Sidebar -->
     <section>
         <?php include '../sidebaradmin.php'; ?>
     </section>
@@ -65,21 +61,22 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
                             <h2>RIWAYAT PENJUALAN BARANG</h2>
                         </div>
                         <div class="body">
-                            <!-- Tombol Transaksi Baru -->
                             <a href="tambah.php" class="btn btn-primary waves-effect m-b-15">
                                 + Transaksi Penjualan Baru
                             </a>
 
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped table-hover">
+                                <table class="table table-bordered table-striped table-hover js-basic-example dataTable">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>No. Nota</th>
                                             <th>Tanggal</th>
+                                            <th>Pemesan</th>
                                             <th>Tipe</th>
                                             <th>Total Harga</th>
                                             <th>Metode</th>
+                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -88,24 +85,45 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
                                         if (!empty($data_penjualan)) {
                                             $no = 1;
                                             foreach ($data_penjualan as $penjualan) {
-                                                $id_penjualan = isset($penjualan['id_penjualan']) ? $penjualan['id_penjualan'] : (isset($penjualan['id']) ? $penjualan['id'] : $penjualan['no_nota']);
                                                 $total_harga = isset($penjualan['total_harga']) ? $penjualan['total_harga'] : 0;
                                                 $tipe = !empty($penjualan['tipe_pesanan']) ? $penjualan['tipe_pesanan'] : '-';
+                                                $pemesan = !empty($penjualan['nama_pelanggan']) ? htmlspecialchars($penjualan['nama_pelanggan']) : '<i>(Walk-in)</i>';
+                                                
+                                                // WAJIB PAKAI 'status_pesanan'
+                                                $status = !empty($penjualan['status_pesanan']) ? $penjualan['status_pesanan'] : 'Selesai';
                                         ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
                                             <td><?= htmlspecialchars($penjualan['no_nota']); ?></td>
                                             <td><?= date('Y-m-d H:i', strtotime($penjualan['tanggal'])); ?></td>
+                                            <td><?= $pemesan; ?></td>
                                             <td><span class="label bg-cyan"><?= htmlspecialchars($tipe); ?></span></td>
                                             <td>Rp <?= number_format($total_harga, 0, ',', '.'); ?></td>
-                                            <td><?= htmlspecialchars($penjualan['metode_bayar']); ?></td>
+                                            <td><?= htmlspecialchars($penjualan['metode_pembayaran'] ?? $penjualan['metode_bayar'] ?? '-'); ?></td>
+                                            
                                             <td>
+                                                <?php if (strtolower($status) == 'selesai'): ?>
+                                                    <span class="label bg-green">Selesai</span>
+                                                <?php else: ?>
+                                                    <span class="label bg-orange" style="background-color: #ff9800 !important; color: white;">Diproses</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            
+                                            <td style="white-space: nowrap;">
+                                                <?php if (strtolower($status) == 'diproses'): ?>
+                                                    <a href="validasi_pesanan.php?nota=<?= urlencode($penjualan['no_nota']); ?>" class="btn btn-xs btn-warning waves-effect" title="Konfirmasi Selesai">
+                                                        <i class="material-icons">check</i>
+                                                    </a>
+                                                <?php endif; ?>
+
                                                 <a href="detail.php?nota=<?= urlencode($penjualan['no_nota']); ?>" class="btn btn-xs btn-info waves-effect" title="Detail">
                                                     <i class="material-icons">visibility</i>
                                                 </a>
+                                                
                                                 <a href="cetak.php?nota=<?= urlencode($penjualan['no_nota']); ?>" target="_blank" class="btn btn-xs btn-success waves-effect" title="Cetak Nota">
                                                     <i class="material-icons">print</i>
                                                 </a>
+
                                                 <a href="hapus.php?nota=<?= urlencode($penjualan['no_nota']); ?>" class="btn btn-xs btn-danger waves-effect" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?');" title="Hapus">
                                                     <i class="material-icons">delete</i>
                                                 </a>
@@ -114,7 +132,7 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
                                         <?php 
                                             }
                                         } else {
-                                            echo "<tr><td colspan='7' class='text-center'>Belum ada transaksi penjualan.</td></tr>";
+                                            echo "<tr><td colspan='9' class='text-center'>Belum ada transaksi penjualan.</td></tr>";
                                         }
                                         ?>
                                     </tbody>
@@ -127,9 +145,7 @@ if ($query_penjualan && mysqli_num_rows($query_penjualan) > 0) {
             <?php include '../footer.php'; ?>
         </div>
     </section>
-    
+
     <?php include '../script.php'; ?>
-
 </body>
-
 </html>

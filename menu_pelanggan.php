@@ -4,9 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once 'database/koneksi.php';
-
-// ini nomor wa nya awalan harus 62 
-$nomor_wa_resto = "6281578075554"; 
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +16,7 @@ $nomor_wa_resto = "6281578075554";
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
-
+    
     <!-- Memanggil CSS Bawaan Template AdminBSB dari folder lokalmu -->
     <link href="AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
@@ -78,7 +75,7 @@ $nomor_wa_resto = "6281578075554";
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(244, 67, 54, 0.9); /* Merah khas AdminBSB */
+            background: rgba(244, 67, 54, 0.9);
             color: #fff;
             padding: 6px 16px;
             font-weight: bold;
@@ -119,9 +116,9 @@ $nomor_wa_resto = "6281578075554";
             align-items: center;
             gap: 6px;
         }
-        .btn-wa {
+        .btn-pesan {
             width: 100%;
-            background-color: #4CAF50 !important;
+            background-color: #2196F3 !important; /* Biru agar kontras dengan tema merah */
             color: #fff !important;
             border-radius: 6px;
             font-weight: bold;
@@ -134,9 +131,10 @@ $nomor_wa_resto = "6281578075554";
             border: none;
             box-shadow: none;
             text-decoration: none;
+            cursor: pointer;
         }
-        .btn-wa:hover {
-            background-color: #388E3C !important;
+        .btn-pesan:hover {
+            background-color: #1976D2 !important;
         }
 
         .block-header-flex {
@@ -161,69 +159,6 @@ $nomor_wa_resto = "6281578075554";
             position: absolute; left: 12px; top: 50%;
             transform: translateY(-50%); color: #888; font-size: 20px;
         }
-
-        /* --- CSS Tambahan untuk Info Rekening --- */
-        .info-rekening-card {
-            background-color: #fff;
-            border-left: 5px solid #F44336; /* Warna merah AdminBSB */
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .info-rekening-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .bank-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            flex: 1;
-            min-width: 250px;
-            margin-bottom: 10px;
-        }
-
-        .bank-icon {
-            background-color: #fce4e4;
-            color: #F44336;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .bank-details h4 {
-            margin: 0 0 3px 0;
-            font-size: 15px;
-            font-weight: bold;
-            color: #222;
-        }
-
-        .bank-details p {
-            margin: 0;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .bank-details .rek-number {
-            font-family: monospace;
-            font-size: 16px;
-            color: #d32f2f;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
     </style>
 </head>
 
@@ -242,44 +177,6 @@ $nomor_wa_resto = "6281578075554";
                     <div class="search-container">
                         <i class="material-icons">search</i>
                         <input type="text" id="searchInput" class="form-control" placeholder="Cari menu masakan yang ingin dipesan...">
-                    </div>
-                </div>
-            </div>
-
-            <!-- INFO REKENING -->
-            <div class="info-rekening-card">
-                <div class="info-rekening-title">
-                    <i class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 5px;">payment</i>
-                    Metode Pembayaran Transfer
-                </div>
-                
-                <div class="row" style="width: 100%; margin: 0;">
-                    <!-- Bank BCA -->
-                    <div class="col-md-6 col-sm-12" style="padding-left: 0;">
-                        <div class="bank-item">
-                            <div class="bank-icon">
-                                <i class="material-icons">account_balance</i>
-                            </div>
-                            <div class="bank-details">
-                                <h4>Bank BCA</h4>
-                                <p class="rek-number">3580437060</p>
-                                <p>A.N Dinda Maria Agatha</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bank BRI -->
-                    <div class="col-md-6 col-sm-12">
-                        <div class="bank-item">
-                            <div class="bank-icon">
-                                <i class="material-icons">account_balance</i>
-                            </div>
-                            <div class="bank-details">
-                                <h4>Bank BRI</h4>
-                                <p class="rek-number">3685-01-004005-53-0</p>
-                                <p>A.N Sulastri</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -324,8 +221,6 @@ $nomor_wa_resto = "6281578075554";
                                         $is_available = ($status_menu === 'tersedia' || $status_menu === '1' || $status_menu === 'on');
                                         
                                         $format_harga = number_format($harga, 0, ',', '.');
-                                        $teks_pesan = "Halo Bakul Sega Bu Lastri, saya ingin memesan menu *" . $nama_menu . "* seharga Rp " . $format_harga . ". Apakah masih bisa dipesan?";
-                                        $link_whatsapp = "https://wa.me/" . $nomor_wa_resto . "?text=" . urlencode($teks_pesan);
                                     ?>
                                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 menu-item">
                                             <div class="menu-card <?= !$is_available ? 'is-disabled' : ''; ?>" id="card-<?= $id_menu; ?>">
@@ -340,11 +235,18 @@ $nomor_wa_resto = "6281578075554";
                                                     
                                                     <div class="menu-actions">
                                                         <?php if ($is_available): ?>
-                                                            <!-- Tombol Pesan WA -->
-                                                            <a href="<?= $link_whatsapp; ?>" target="_blank" class="btn waves-effect btn-wa">
-                                                                <i class="material-icons" style="font-size: 18px;">message</i> 
-                                                                <span>Pesan via WhatsApp</span>
-                                                            </a>
+                                                            <!-- Form Tambah ke Keranjang -->
+                                                            <form action="proses_keranjang.php" method="POST" style="width: 100%; margin: 0;">
+                                                                <input type="hidden" name="id_menu" value="<?= $id_menu; ?>">
+                                                                <input type="hidden" name="nama_menu" value="<?= htmlspecialchars($nama_menu); ?>">
+                                                                <input type="hidden" name="harga" value="<?= $harga; ?>">
+                                                                <input type="hidden" name="qty" value="1">
+                                                                
+                                                                <button type="submit" class="btn waves-effect btn-pesan">
+                                                                    <i class="material-icons" style="font-size: 18px;">add_shopping_cart</i> 
+                                                                    <span>Pesan Sekarang</span>
+                                                                </button>
+                                                            </form>
                                                         <?php else: ?>
                                                             <!-- Tombol Disable -->
                                                             <button class="btn btn-default waves-effect" disabled style="width: 100%; border-radius: 6px; font-weight: bold; padding: 8px;">
@@ -355,9 +257,7 @@ $nomor_wa_resto = "6281578075554";
                                                 </div>
                                             </div>
                                         </div>
-                                    <?php 
-                                    } 
-                                    ?>
+                                    <?php } ?>
                                 </div>
                             </div>
                 <?php

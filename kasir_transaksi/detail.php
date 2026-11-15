@@ -33,7 +33,7 @@ if (!$penjualan) {
     exit();
 }
 
-// Ambil data detail barang/menu yang dibeli pada transaksi ini (disesuaikan m.id)
+// Ambil data detail barang/menu yang dibeli pada transaksi ini
 $query_detail = mysqli_query($con, "SELECT pd.*, m.nama_menu FROM penjualan_detail pd JOIN menu m ON pd.id_menu = m.id WHERE pd.no_nota = '" . mysqli_real_escape_string($con, $no_nota) . "'");
 ?>
 
@@ -49,6 +49,20 @@ $query_detail = mysqli_query($con, "SELECT pd.*, m.nama_menu FROM penjualan_deta
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
     <?php include '../css.php'; ?>
+    <style>
+        .table-info th {
+            width: 250px;
+            font-weight: bold;
+            color: #555;
+            border-top: none !important;
+        }
+        .table-info td {
+            border-top: none !important;
+        }
+        .table-info tr {
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
 
 <body class="theme-red">
@@ -78,54 +92,53 @@ $query_detail = mysqli_query($con, "SELECT pd.*, m.nama_menu FROM penjualan_deta
                             <h2>DETAIL TRANSAKSI PENJUALAN</h2>
                         </div>
                         <div class="body">
-                            <!-- Tombol Kembali & Cetak -->
-                            <a href="index.php" class="btn btn-primary waves-effect m-b-15">
-                                <i class="material-icons" style="font-size: 16px; vertical-align: middle;">arrow_back</i> Kembali
-                            </a>
-
-                            <hr>
 
                             <!-- Informasi Utama Transaksi -->
                             <div class="row clearfix">
-                                <div class="col-md-6">
-                                    <table class="table table-striped">
+                                <div class="col-md-12">
+                                    <table class="table table-info">
                                         <tr>
-                                            <th style="width: 40%;">No. Nota</th>
-                                            <td>: <strong><?= htmlspecialchars($penjualan['no_nota']); ?></strong></td>
+                                            <th>No. Nota</th>
+                                            <td>: <?= htmlspecialchars($penjualan['no_nota']); ?></td>
                                         </tr>
                                         <tr>
-                                            <th>Tanggal</th>
+                                            <th>Tanggal Penjualan</th>
                                             <td>: <?= date('Y-m-d H:i', strtotime($penjualan['tanggal'])); ?></td>
                                         </tr>
                                         <tr>
-                                            <th>Tipe Pesanan</th>
-                                            <td>: <span class="label bg-cyan"><?= htmlspecialchars($penjualan['tipe_pesanan'] ?? '-'); ?></span></td>
+                                            <th>Nama Pemesan</th>
+                                            <td>: <i><?= htmlspecialchars($penjualan['nama_pemesan'] ?? '(Walk-in)'); ?></i></td>
                                         </tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <table class="table table-striped">
                                         <tr>
-                                            <th style="width: 40%;">Metode Pembayaran</th>
+                                            <th>Alamat Pengiriman</th>
+                                            <td>: <i><?= htmlspecialchars($penjualan['alamat_pengiriman'] ?? 'Beli di Tempat'); ?></i></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Tipe Pesanan</th>
+                                            <td>: <span class="label bg-cyan"><?= htmlspecialchars($penjualan['tipe_pesanan'] ?? 'Ditempat'); ?></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Metode Pembayaran</th>
                                             <td>: <?= htmlspecialchars($penjualan['metode_bayar']); ?></td>
                                         </tr>
                                         <tr>
-                                            <th>Total Harga</th>
-                                            <td>: <strong class="text-danger">Rp <?= number_format($penjualan['total_harga'], 0, ',', '.'); ?></strong></td>
+                                            <th>Status Pesanan</th>
+                                            <td>: <span class="label bg-green"><?= htmlspecialchars($penjualan['status_pesanan'] ?? 'Selesai'); ?></span></td>
                                         </tr>
                                     </table>
                                 </div>
                             </div>
 
-                            <h3 class="card-inside-title">Daftar Item Menu yang Dibeli</h3>
+                            <br>
+                            <h4>Rincian Menu Penjualan</h4>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
+                                            <th style="width: 50px;">No</th>
                                             <th>Nama Menu</th>
+                                            <th>Jumlah</th>
                                             <th>Harga Satuan</th>
-                                            <th>Jumlah (Qty)</th>
                                             <th>Subtotal</th>
                                         </tr>
                                     </thead>
@@ -141,8 +154,8 @@ $query_detail = mysqli_query($con, "SELECT pd.*, m.nama_menu FROM penjualan_deta
                                         <tr>
                                             <td><?= $no++; ?></td>
                                             <td><?= htmlspecialchars($detail['nama_menu']); ?></td>
-                                            <td>Rp <?= number_format($harga, 0, ',', '.'); ?></td>
                                             <td><?= $jumlah; ?></td>
+                                            <td>Rp <?= number_format($harga, 0, ',', '.'); ?></td>
                                             <td>Rp <?= number_format($subtotal, 0, ',', '.'); ?></td>
                                         </tr>
                                         <?php 
@@ -152,8 +165,19 @@ $query_detail = mysqli_query($con, "SELECT pd.*, m.nama_menu FROM penjualan_deta
                                         }
                                         ?>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-right" style="vertical-align: middle;"><strong>Total Transaksi:</strong></td>
+                                            <td><strong>Rp <?= number_format($penjualan['total_harga'], 0, ',', '.'); ?></strong></td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
+                            
+                            <!-- Tombol Kembali diletakkan di bawah seperti Admin -->
+                            <a href="index.php" class="btn btn-default waves-effect m-t-15">
+                                <i class="material-icons" style="font-size: 16px; vertical-align: middle;">arrow_back</i> Kembali
+                            </a>
 
                         </div>
                     </div>

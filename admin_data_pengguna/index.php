@@ -25,15 +25,7 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
 
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <!-- Waves Effect Css -->
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <!-- Animation Css -->
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <!-- Custom Css -->
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <!-- AdminBSB Themes -->
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    <?php include '../css.php'; ?>
 </head>
 
 <body class="theme-red">
@@ -81,7 +73,7 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    // Mengambil data pengguna berdasarkan username
+                                    // buat ngambil data berdasatkan username
                                     $query = mysqli_query($con, "SELECT * FROM tbl_user ORDER BY username ASC");
                                     $no = 1;
 
@@ -132,19 +124,10 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
         </div>
     </section>
 
-    <!-- Jquery Core Js -->
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap Core Js -->
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <!-- Slimscroll Plugin Js -->
-    <script src="../AdminBSB/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-    <!-- Waves Effect Plugin Js -->
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <!-- Custom Js -->
-    <script src="../AdminBSB/js/admin.js"></script>
+    <?php include '../script.php'; ?>
 
     <script>
-    // Inisialisasi SlimScroll agar sidebar bisa di-scroll dengan rapi
+    // buat ngerapiin scroll di sidebar
     $(document).ready(function() {
         if ($.fn.slimScroll) {
             $('.list').slimscroll({

@@ -9,7 +9,6 @@ require_once '../database/koneksi.php';
 $authority = @$_SESSION['peran'];
 $is_2fa_passed = @$_SESSION['is_2fa_passed'];
 
-// Penyesuaian pengecekan authority untuk peran Kasir
 if (($authority != 'K' && $authority != 'Kasir' && $authority != 'kasir') || $is_2fa_passed !== true) {
     echo '<script>alert ("Akses ditolak. Silakan login kembali.");</script>';
     echo '<script>window.location.href ="../logout.php";</script>';
@@ -17,6 +16,31 @@ if (($authority != 'K' && $authority != 'Kasir' && $authority != 'kasir') || $is
 }
 
 $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION['no_hp'] ?? 'Kasir';
+
+// --- QUERY UNTUK WIDGET ATAS ---
+$tanggal_sekarang = date('Y-m-d');
+$bulan_sekarang = date('m');
+$tahun_sekarang = date('Y');
+
+// 1. Penjualan Hari Ini
+$query_penjualan_hari = mysqli_query($con, "SELECT SUM(total_harga) AS total FROM penjualan WHERE DATE(tanggal) = '$tanggal_sekarang'");
+$data_penjualan_hari = mysqli_fetch_assoc($query_penjualan_hari);
+$penjualan_hari = $data_penjualan_hari['total'] ?? 0;
+
+// 2. Transaksi Hari Ini
+$query_transaksi_hari = mysqli_query($con, "SELECT COUNT(id_penjualan) AS total FROM penjualan WHERE DATE(tanggal) = '$tanggal_sekarang'");
+$data_transaksi_hari = mysqli_fetch_assoc($query_transaksi_hari);
+$transaksi_hari = $data_transaksi_hari['total'] ?? 0;
+
+// 3. Total Penjualan Bulan Ini
+$query_penjualan_bulan = mysqli_query($con, "SELECT SUM(total_harga) AS total FROM penjualan WHERE MONTH(tanggal) = '$bulan_sekarang' AND YEAR(tanggal) = '$tahun_sekarang'");
+$data_penjualan_bulan = mysqli_fetch_assoc($query_penjualan_bulan);
+$penjualan_bulan = $data_penjualan_bulan['total'] ?? 0;
+
+// 4. Menu Tersedia 
+$query_menu = mysqli_query($con, "SELECT COUNT(*) AS total FROM menu WHERE status = 'tersedia'"); 
+$data_menu = mysqli_fetch_assoc($query_menu);
+$menu_tersedia = $data_menu['total'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -25,15 +49,11 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title>Dashboard Kasir - BAKUL SEGA BU LASTRI</title>
-
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
-
-    <link href="../AdminBSB/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="../AdminBSB/plugins/node-waves/waves.css" rel="stylesheet" />
-    <link href="../AdminBSB/plugins/animate-css/animate.css" rel="stylesheet" />
-    <link href="../AdminBSB/css/style.css" rel="stylesheet">
-    <link href="../AdminBSB/css/themes/all-themes.css" rel="stylesheet" />
+    
+    <?php include '../css.php'; ?>
+    
 </head>
 
 <body class="theme-red">
@@ -54,45 +74,37 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
             <div class="row clearfix">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="info-box bg-pink hover-expand-effect">
-                        <div class="icon">
-                            <i class="material-icons">attach_money</i>
-                        </div>
+                        <div class="icon"><i class="material-icons">attach_money</i></div>
                         <div class="content">
                             <div class="text">PENJUALAN HARI INI</div>
-                            <div class="number">Rp 0</div>
+                            <div class="number">Rp <?= number_format($penjualan_hari, 0, ',', '.'); ?></div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="info-box bg-cyan hover-expand-effect">
-                        <div class="icon">
-                            <i class="material-icons">shopping_cart</i>
-                        </div>
+                        <div class="icon"><i class="material-icons">shopping_cart</i></div>
                         <div class="content">
                             <div class="text">TRANSAKSI HARI INI</div>
-                            <div class="number">0 Nota</div>
+                            <div class="number"><?= $transaksi_hari; ?> Nota</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="info-box bg-light-green hover-expand-effect">
-                        <div class="icon">
-                            <i class="material-icons">trending_up</i>
-                        </div>
+                        <div class="icon"><i class="material-icons">trending_up</i></div>
                         <div class="content">
-                            <div class="text">TOTAL PENJUALAN BULAN INI</div>
-                            <div class="number">Rp 6.000</div>
+                            <div class="text">PENJUALAN BULAN INI</div>
+                            <div class="number">Rp <?= number_format($penjualan_bulan, 0, ',', '.'); ?></div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                     <div class="info-box bg-orange hover-expand-effect">
-                        <div class="icon">
-                            <i class="material-icons">restaurant_menu</i>
-                        </div>
+                        <div class="icon"><i class="material-icons">restaurant_menu</i></div>
                         <div class="content">
                             <div class="text">MENU TERSEDIA</div>
-                            <div class="number">2 Item</div>
+                            <div class="number"><?= $menu_tersedia; ?> Item</div>
                         </div>
                     </div>
                 </div>
@@ -119,20 +131,23 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>NOTA-20261013-0001</td>
-                                            <td>13/10/2026 12:22</td>
-                                            <td><span class="label bg-blue">Ditempat</span></td>
-                                            <td><span class="label bg-light-green">Tunai</span></td>
-                                            <td>Rp 6.000</td>
-                                        </tr>
-                                        <tr>
-                                            <td>NOTA-20260929-0001</td>
-                                            <td>29/09/2026 11:42</td>
-                                            <td><span class="label bg-blue">Ditempat</span></td>
-                                            <td><span class="label bg-light-green">Tunai</span></td>
-                                            <td>Rp 200.000</td>
-                                        </tr>
+                                        <?php
+                                        // Menampilkan 5 transaksi terakhir secara dinamis
+                                        $query_terbaru = mysqli_query($con, "SELECT * FROM penjualan ORDER BY tanggal DESC LIMIT 5");
+                                        if ($query_terbaru && mysqli_num_rows($query_terbaru) > 0) {
+                                            while ($data_terbaru = mysqli_fetch_assoc($query_terbaru)) {
+                                                echo "<tr>";
+                                                echo "<td>{$data_terbaru['no_nota']}</td>";
+                                                echo "<td>{$data_terbaru['tanggal']}</td>";
+                                                echo "<td><span class='label bg-blue'>{$data_terbaru['tipe_pesanan']}</span></td>";
+                                                echo "<td><span class='label bg-light-green'>{$data_terbaru['metode_bayar']}</span></td>";
+                                                echo "<td>Rp " . number_format($data_terbaru['total_harga'], 0, ',', '.') . "</td>";
+                                                echo "</tr>";
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='5' class='text-center'>Belum ada transaksi penjualan terbaru.</td></tr>";
+                                        }
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -148,18 +163,28 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
                         </div>
                         <div class="body">
                             <ul class="list-group">
-                                <li class="list-group-item">
-                                    Gudeg 
-                                    <span class="badge bg-teal">20 porsi</span>
-                                </li>
-                                <li class="list-group-item">
-                                    Oseng Gambas 
-                                    <span class="badge bg-teal">1 porsi</span>
-                                </li>
-                                <li class="list-group-item">
-                                    Oseng Kangkung 
-                                    <span class="badge bg-teal">1 porsi</span>
-                                </li>
+                                <?php
+                                // Mengambil 5 menu dengan jumlah penjualan terbanyak (JOIN penjualan_detail dan menu)
+                                $query_terlaris = mysqli_query($con, "
+                                    SELECT menu.nama_menu, SUM(penjualan_detail.jumlah) AS total_terjual 
+                                    FROM penjualan_detail 
+                                    JOIN menu ON penjualan_detail.id_menu = menu.id 
+                                    GROUP BY penjualan_detail.id_menu 
+                                    ORDER BY total_terjual DESC 
+                                    LIMIT 5
+                                ");
+
+                                if ($query_terlaris && mysqli_num_rows($query_terlaris) > 0) {
+                                    while ($data_terlaris = mysqli_fetch_assoc($query_terlaris)) {
+                                        echo "<li class='list-group-item'>";
+                                        echo $data_terlaris['nama_menu'];
+                                        echo "<span class='badge bg-teal'>{$data_terlaris['total_terjual']} porsi</span>";
+                                        echo "</li>";
+                                    }
+                                } else {
+                                    echo "<li class='list-group-item text-center'>Belum ada data penjualan</li>";
+                                }
+                                ?>
                             </ul>
                         </div>
                     </div>
@@ -168,13 +193,10 @@ $user_display = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? $_SESSION[
             <!-- SELESAI KONTEN UTAMA -->
 
             <?php include '../footer.php'; ?>
-
         </div>
     </section>
 
-    <script src="../AdminBSB/plugins/jquery/jquery.min.js"></script>
-    <script src="../AdminBSB/plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="../AdminBSB/plugins/node-waves/waves.js"></script>
-    <script src="../AdminBSB/js/admin.js"></script>
+    <?php include '../script.php'; ?>
+
 </body>
 </html>

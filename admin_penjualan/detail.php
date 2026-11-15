@@ -66,7 +66,7 @@ if (!$penjualan) {
                             <h2>DETAIL TRANSAKSI PENJUALAN</h2>
                         </div>
                         <div class="body">
-                            <table class="table table-borderless" style="max-width: 600px;">
+                            <table class="table table-borderless" style="max-width: 650px;">
                                 <tr>
                                     <td width="200"><strong>No. Nota</strong></td>
                                     <td width="20">:</td>
@@ -78,6 +78,22 @@ if (!$penjualan) {
                                     <td><?= date('Y-m-d H:i', strtotime($penjualan['tanggal'])); ?></td>
                                 </tr>
                                 <tr>
+                                    <td><strong>Nama Pemesan</strong></td>
+                                    <td>:</td>
+                                    <td><?= !empty($penjualan['nama_pelanggan']) ? htmlspecialchars($penjualan['nama_pelanggan']) : '<i>(Walk-in)</i>'; ?></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Alamat Pengiriman</strong></td>
+                                    <td>:</td>
+                                    <td>
+                                        <?php 
+                                        // PERBAIKAN: Gunakan 'keterangan_lokasi' sesuai nama kolom di database
+                                        $alamat = !empty($penjualan['keterangan_lokasi']) ? $penjualan['keterangan_lokasi'] : '';
+                                        echo !empty($alamat) ? htmlspecialchars($alamat) : '<i>- (Beli di Tempat / Dine-in)</i>';
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td><strong>Tipe Pesanan</strong></td>
                                     <td>:</td>
                                     <td><span class="label bg-cyan"><?= htmlspecialchars($penjualan['tipe_pesanan'] ? $penjualan['tipe_pesanan'] : '-'); ?></span></td>
@@ -86,6 +102,22 @@ if (!$penjualan) {
                                     <td><strong>Metode Pembayaran</strong></td>
                                     <td>:</td>
                                     <td><?= htmlspecialchars($penjualan['metode_bayar']); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status Pesanan</strong></td>
+                                    <td>:</td>
+                                    <td>
+                                        <?php
+                                        $status = !empty($penjualan['status_pesanan']) ? $penjualan['status_pesanan'] : 'Selesai';
+                                        if ($status == 'Menunggu Konfirmasi') {
+                                            echo '<span class="label bg-orange">Menunggu Konfirmasi</span>';
+                                        } elseif ($status == 'Diproses') {
+                                            echo '<span class="label bg-blue">Diproses</span>';
+                                        } else {
+                                            echo '<span class="label bg-green">Selesai</span>';
+                                        }
+                                        ?>
+                                    </td>
                                 </tr>
                             </table>
 
@@ -114,7 +146,6 @@ if (!$penjualan) {
                                         if ($query_detail && mysqli_num_rows($query_detail) > 0) {
                                             while ($detail = mysqli_fetch_assoc($query_detail)) {
                                                 $jumlah = $detail['jumlah'];
-                                                // Jika harga di detail 0 atau kosong, ambil harga dari master menu
                                                 $harga = ($detail['harga'] > 0) ? $detail['harga'] : $detail['harga_menu'];
                                                 $subtotal = ($detail['subtotal'] > 0) ? $detail['subtotal'] : ($jumlah * $harga);
                                                 $nama_menu = $detail['nama_menu'] ? $detail['nama_menu'] : 'Menu Tidak Ditemukan';

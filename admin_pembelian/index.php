@@ -14,7 +14,7 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     exit();
 }
 
-// SIMPAN SEMUA DATA PEMBELIAN KE ARRAY SUPAYA MODAL BISA DIRENDER DI LUAR TABEL
+// nyimpen data beli ke array
 $data_pembelian = [];
 $query_pembelian = mysqli_query($con, "SELECT pembelian.*, supplier.nama_supplier 
         FROM pembelian 

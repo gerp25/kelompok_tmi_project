@@ -14,21 +14,21 @@ if (($authority != 'A' && $authority != 'Admin') || $is_2fa_passed !== true) {
     exit();
 }
 
-// Inisialisasi Filter Tanggal
+// buat ngefilterin tgl
 $tgl_mulai = isset($_GET['tgl_mulai']) ? $_GET['tgl_mulai'] : date('Y-m-01');
 $tgl_selesai = isset($_GET['tgl_selesai']) ? $_GET['tgl_selesai'] : date('Y-m-d');
 
-// 1. Hitung Total Penjualan (Pendapatan)
+// buat ngehitung total pendapatan
 $q_tot_penjualan = mysqli_query($con, "SELECT SUM(total_harga) AS total FROM penjualan WHERE DATE(tanggal) BETWEEN '$tgl_mulai' AND '$tgl_selesai'");
 $d_tot_penjualan = mysqli_fetch_assoc($q_tot_penjualan);
 $total_penjualan = $d_tot_penjualan['total'] ? $d_tot_penjualan['total'] : 0;
 
-// 2. Hitung Total Pembelian (Pengeluaran)
+// buat ngehitung total pengeluaran
 $q_tot_pembelian = mysqli_query($con, "SELECT SUM(total_harga) AS total FROM pembelian WHERE DATE(tgl_pembelian) BETWEEN '$tgl_mulai' AND '$tgl_selesai'");
 $d_tot_pembelian = mysqli_fetch_assoc($q_tot_pembelian);
 $total_pembelian = $d_tot_pembelian['total'] ? $d_tot_pembelian['total'] : 0;
 
-// 3. Hitung Laba/Rugi (Penjualan - Pembelian)
+// buat ngehitung lba ruginya
 $laba_rugi = $total_penjualan - $total_pembelian;
 ?>
 
@@ -45,27 +45,24 @@ $laba_rugi = $total_penjualan - $total_pembelian;
     <?php include '../css.php'; ?>
 
     <style>
-        /* CSS Scroll Sidebar AdminBSB di Layar Biasa */
         section.sidebar, .sidebar .menu {
             height: calc(100vh - 70px) !important;
             overflow-y: auto !important;
         }
 
-        /* Elemen Khusus Cetak Sembunyi di Layar */
         @media screen {
             .print-only {
                 display: none !important;
             }
         }
 
-        /* CSS Khusus Mode Cetak / PDF */
         @page {
             size: A4 portrait;
-            margin: 0; /* Menghilangkan Header & Footer Bawaan Browser */
+            margin: 0;
         }
 
         @media print {
-            /* Sembunyikan Komponen Web Navigasi */
+
             nav, .navbar, aside, #leftsidebar, .sidebar, section.sidebar,
             .user-info, .legal, .overlay, .no-print, .block-header, form, footer {
                 display: none !important;
@@ -102,7 +99,6 @@ $laba_rugi = $total_penjualan - $total_pembelian;
                 padding: 0 !important;
             }
 
-            /* Style KOP Laporan berbasis Tabel (Sangat Presisi & Rapi) */
             .table-kop {
                 width: 100% !important;
                 border-collapse: collapse !important;
@@ -116,7 +112,6 @@ $laba_rugi = $total_penjualan - $total_pembelian;
                 vertical-align: middle !important;
             }
 
-            /* Style Tabel Resmi Laporan */
             .table-report {
                 width: 100% !important;
                 border-collapse: collapse !important;

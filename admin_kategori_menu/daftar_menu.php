@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -47,10 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit();
 }
 
-// Menangkap ID Kategori dari URL
 $kategori_id = isset($_GET['kategori_id']) ? mysqli_real_escape_string($con, $_GET['kategori_id']) : '';
 
-// Mengambil info nama kategori
 $nama_kategori = 'Semua Menu';
 if (!empty($kategori_id)) {
     $query_kat_info = mysqli_query($con, "SELECT * FROM kategori_menu WHERE id = '$kategori_id'");
@@ -539,4 +537,4 @@ if (!empty($kategori_id)) {
         });
     </script>
 </body>
-</html>
+</html> -->
