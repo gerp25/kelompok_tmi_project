@@ -64,6 +64,9 @@ if (isset($_POST['simpan_transaksi'])) {
         $tanggal .= ':00';
     }
     $tipe_pesanan = trim($_POST['tipe_pesanan'] ?? 'Ditempat');
+    if ($tipe_pesanan !== 'Ditempat' && $tipe_pesanan !== 'Dikirim') {
+        $tipe_pesanan = 'Ditempat';
+    }
     $metode_bayar = trim($_POST['metode_bayar'] ?? 'Tunai');
     $items = (isset($_POST['items']) && is_array($_POST['items'])) ? $_POST['items'] : [];
 
@@ -120,7 +123,7 @@ if (isset($_POST['simpan_transaksi'])) {
             // Insert ke tabel penjualan_detail
             $stmt_detail = mysqli_prepare(
                 $con,
-                "INSERT INTO penjualan_detail (no_nota, menu_id, qty, harga, subtotal) VALUES (?, ?, ?, ?, ?)"
+                "INSERT INTO penjualan_detail (no_nota, id_menu, jumlah, harga, subtotal) VALUES (?, ?, ?, ?, ?)"
             );
             if (!$stmt_detail) {
                 throw new Exception(mysqli_error($con));
@@ -247,7 +250,7 @@ if (isset($_POST['simpan_transaksi'])) {
                                         <div class="form-group">
                                             <select name="tipe_pesanan" id="tipe_pesanan" class="form-control show-tick" required>
                                                 <option value="Ditempat">Ditempat</option>
-                                                <option value="Bungkus">Bungkus</option>
+                                                <option value="Dikirim">Dikirim</option>
                                             </select>
                                         </div>
                                     </div>
