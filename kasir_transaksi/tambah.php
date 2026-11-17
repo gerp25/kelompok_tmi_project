@@ -5,65 +5,140 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once '../database/koneksi.php';
 
-$authority = @$_SESSION['peran'];
-$is_2fa_passed = @$_SESSION['is_2fa_passed'];
+$authority = $_SESSION['peran'] ?? '';
+$is_2fa_passed = $_SESSION['is_2fa_passed'] ?? false;
 
-if (($authority != 'K' && $authority != 'Kasir') || $is_2fa_passed !== true) {
+if (($authority !== 'K' && $authority !== 'Kasir') || $is_2fa_passed !== true) {
     echo '<script>alert("Akses ditolak. Silakan login kembali.");</script>';
-    echo '<script>window.location.href ="../logout.php";</script>';
+    echo '<script>window.location.href = "../logout.php";</script>';
     exit();
 }
 
 // Format No. Nota otomatis: NOTA-YYYYMMDD-0001
 $today = date("Ymd");
-$query_max = mysqli_query($con, "SELECT MAX(no_nota) as max_nota FROM penjualan WHERE no_nota LIKE 'NOTA-$today-%'");
-$data_max = mysqli_fetch_assoc($query_max);
-$last_nota =$data_max['max_nota'];
+$no_nota_pattern = "NOTA-" . $today . "-%";
+$stmt_max = mysqli_prepare($con, "SELECT MAX(no_nota) AS max_nota FROM penjualan WHERE no_nota LIKE ?");
+$last_nota = null;
 
-if ($last_nota) {$last_num = (int) substr($last_nota, -4);$next_num = sprintf("%04d", $last_num + 1); } else {$next_num = "0001";
+if ($stmt_max) {
+    mysqli_stmt_bind_param($stmt_max, "s", $no_nota_pattern);
+    mysqli_stmt_execute($stmt_max);
+    $result_max = mysqli_stmt_get_result($stmt_max);
+    if ($result_max) {
+        $data_max = mysqli_fetch_assoc($result_max);
+        $last_nota = $data_max['max_nota'] ?? null;
+    }
+    mysqli_stmt_close($stmt_max);
+}
+
+if ($last_nota) {
+    $last_num = (int) substr($last_nota, -4);
+    $next_num = sprintf("%04d", $last_num + 1);
+} else {
+    $next_num = "0001";
 }
 $no_nota_auto = "NOTA-" . $today . "-" . $next_num;
 
-// Ambil data menu dari database (menggunakan kolom id)
+// Ambil data menu yang tersedia dari database
 $data_menu = [];
+$harga_menu_map = [];
 $query_menu = mysqli_query($con, "SELECT id, nama_menu, harga FROM menu WHERE status = 'tersedia' ORDER BY nama_menu ASC");
 if ($query_menu) {
     while ($row = mysqli_fetch_assoc($query_menu)) {
-        $data_menu[] =$row;
+        $menu_id_int = (int) $row['id'];
+        $menu_harga_float = (float) $row['harga'];
+        $data_menu[] = [
+            'id' => $menu_id_int,
+            'nama_menu' => $row['nama_menu'],
+            'harga' => $menu_harga_float
+        ];
+        $harga_menu_map[$menu_id_int] = $menu_harga_float;
     }
 }
 
-// Proses Simpan Transaksi
 if (isset($_POST['simpan_transaksi'])) {
-    $no_nota      = mysqli_real_escape_string($con, $_POST['no_nota']);$tanggal      = str_replace('T', ' ', mysqli_real_escape_string($con,$_POST['tanggal']));
-    $tipe_pesanan = mysqli_real_escape_string($con, $_POST['tipe_pesanan']);$metode_bayar = mysqli_real_escape_string($con,$_POST['metode_bayar']);
-    $total_harga  = floatval($_POST['total_harga']);
-    $items        = isset($_POST['items']) && is_array($_POST['items']) ?$_POST['items'] : [];
+    $no_nota = trim($_POST['no_nota'] ?? '');
+    $tanggal_raw = trim($_POST['tanggal'] ?? '');
+    $tanggal = str_replace('T', ' ', $tanggal_raw);
+    if (strlen($tanggal) === 16) {
+        $tanggal .= ':00';
+    }
+    $tipe_pesanan = trim($_POST['tipe_pesanan'] ?? 'Ditempat');
+    $metode_bayar = trim($_POST['metode_bayar'] ?? 'Tunai');
+    $items = (isset($_POST['items']) && is_array($_POST['items'])) ? $_POST['items'] : [];
 
-    if (!empty($items)) {
+    // Filter item yang valid
+    $valid_items = [];
+    $calculated_total_harga = 0.0;
+
+    foreach ($items as $item) {
+        $menu_id = isset($item['menu_id']) ? (int) $item['menu_id'] : 0;
+        $qty = isset($item['qty']) ? (int) $item['qty'] : 0;
+
+        if ($menu_id > 0 && $qty > 0 && isset($harga_menu_map[$menu_id])) {
+            $harga_satuan = $harga_menu_map[$menu_id];
+            $subtotal = $qty * $harga_satuan;
+            $calculated_total_harga += $subtotal;
+
+            $valid_items[] = [
+                'menu_id' => $menu_id,
+                'qty' => $qty,
+                'harga' => $harga_satuan,
+                'subtotal' => $subtotal
+            ];
+        }
+    }
+
+    if (!empty($valid_items)) {
         mysqli_begin_transaction($con);
 
         try {
             // Insert ke tabel penjualan
-            $stmt_penjualan = mysqli_prepare($con, "INSERT INTO penjualan (no_nota, tanggal, tipe_pesanan, total_harga, metode_bayar) VALUES (?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt_penjualan, "sssds", $no_nota, $tanggal,$tipe_pesanan, $total_harga,$metode_bayar);
-            
+            $stmt_penjualan = mysqli_prepare(
+                $con,
+                "INSERT INTO penjualan (no_nota, tanggal, tipe_pesanan, total_harga, metode_bayar) VALUES (?, ?, ?, ?, ?)"
+            );
+            if (!$stmt_penjualan) {
+                throw new Exception(mysqli_error($con));
+            }
+
+            mysqli_stmt_bind_param(
+                $stmt_penjualan,
+                "sssds",
+                $no_nota,
+                $tanggal,
+                $tipe_pesanan,
+                $calculated_total_harga,
+                $metode_bayar
+            );
+
             if (!mysqli_stmt_execute($stmt_penjualan)) {
                 throw new Exception(mysqli_stmt_error($stmt_penjualan));
             }
             mysqli_stmt_close($stmt_penjualan);
 
-            // Insert ke tabel penjualan_detail (kolom menu_id)
-            $stmt_detail = mysqli_prepare($con, "INSERT INTO penjualan_detail (no_nota, menu_id, qty, harga, subtotal) VALUES (?, ?, ?, ?, ?)");
+            // Insert ke tabel penjualan_detail
+            $stmt_detail = mysqli_prepare(
+                $con,
+                "INSERT INTO penjualan_detail (no_nota, menu_id, qty, harga, subtotal) VALUES (?, ?, ?, ?, ?)"
+            );
+            if (!$stmt_detail) {
+                throw new Exception(mysqli_error($con));
+            }
 
-            foreach ($items as$item) {
-                if (!empty($item['menu_id']) && intval($item['qty']) > 0) {$menu_id  = intval($item['menu_id']);$qty      = intval($item['qty']);$harga    = floatval($item['harga']);$subtotal = $qty * $harga;
+            foreach ($valid_items as $valid_item) {
+                mysqli_stmt_bind_param(
+                    $stmt_detail,
+                    "siidd",
+                    $no_nota,
+                    $valid_item['menu_id'],
+                    $valid_item['qty'],
+                    $valid_item['harga'],
+                    $valid_item['subtotal']
+                );
 
-                    mysqli_stmt_bind_param($stmt_detail, "siidd", $no_nota, $menu_id,$qty, $harga,$subtotal);
-                    
-                    if (!mysqli_stmt_execute($stmt_detail)) {
-                        throw new Exception(mysqli_stmt_error($stmt_detail));
-                    }
+                if (!mysqli_stmt_execute($stmt_detail)) {
+                    throw new Exception(mysqli_stmt_error($stmt_detail));
                 }
             }
             mysqli_stmt_close($stmt_detail);
@@ -71,13 +146,12 @@ if (isset($_POST['simpan_transaksi'])) {
             mysqli_commit($con);
             echo '<script>alert("Transaksi berhasil disimpan!"); window.location.href="index.php";</script>';
             exit();
-
         } catch (Exception $e) {
             mysqli_rollback($con);
             echo '<script>alert("Gagal menyimpan transaksi: ' . addslashes($e->getMessage()) . '");</script>';
         }
     } else {
-        echo '<script>alert("Pilih minimal satu menu!");</script>';
+        echo '<script>alert("Pilih minimal satu menu yang tersedia dengan jumlah minimal 1!");</script>';
     }
 }
 ?>
@@ -115,6 +189,11 @@ if (isset($_POST['simpan_transaksi'])) {
         .text-right-input {
             text-align: right;
         }
+        @media (min-width: 768px) {
+            .table-responsive {
+                overflow: visible;
+            }
+        }
     </style>
 </head>
 
@@ -144,14 +223,14 @@ if (isset($_POST['simpan_transaksi'])) {
                             <h2>TAMBAH TRANSAKSI PENJUALAN</h2>
                         </div>
                         <div class="body">
-                            <form method="POST" action="">
+                            <form method="POST" action="" id="form_transaksi">
                                 <!-- Baris Field Atas -->
                                 <div class="row clearfix m-b-20">
                                     <div class="col-md-3">
                                         <label for="no_nota">No. Nota</label>
                                         <div class="form-group">
                                             <div class="form-line">
-                                                <input type="text" id="no_nota" name="no_nota" class="form-control" value="<?= $no_nota_auto; ?>" readonly>
+                                                <input type="text" id="no_nota" name="no_nota" class="form-control" value="<?= htmlspecialchars($no_nota_auto, ENT_QUOTES); ?>" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -197,14 +276,13 @@ if (isset($_POST['simpan_transaksi'])) {
                                             </tr>
                                         </thead>
                                         <tbody id="tbody_items">
-                                            <!-- Row pertama standar PHP -->
                                             <tr class="item-row">
                                                 <td>
-                                                    <select class="form-control select-menu" name="items[0][menu_id]" onchange="updateHarga(this)" required>
+                                                    <select class="form-control select-menu" name="items[0][menu_id]" required>
                                                         <option value="">-- Pilih Menu --</option>
-                                                        <?php foreach ($data_menu as$m): ?>
-                                                            <option value="<?= $m['id']; ?>" data-harga="<?= $m['harga']; ?>">
-                                                                <?= htmlspecialchars($m['nama_menu'], ENT_QUOTES); ?>
+                                                        <?php foreach ($data_menu as $menu_item): ?>
+                                                            <option value="<?= $menu_item['id']; ?>" data-harga="<?= $menu_item['harga']; ?>">
+                                                                <?= htmlspecialchars($menu_item['nama_menu'], ENT_QUOTES); ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -213,13 +291,13 @@ if (isset($_POST['simpan_transaksi'])) {
                                                     <input type="number" class="form-control input-harga text-right-input" name="items[0][harga]" value="0" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control input-qty text-right-input" name="items[0][qty]" value="1" min="1" oninput="hitungRow(this)" required>
+                                                    <input type="number" class="form-control input-qty text-right-input" name="items[0][qty]" value="1" min="1" required>
                                                 </td>
                                                 <td>
                                                     <input type="number" class="form-control input-subtotal text-right-input" name="items[0][subtotal]" value="0" readonly>
                                                 </td>
                                                 <td class="text-center">
-                                                    <button type="button" class="btn btn-xs btn-danger waves-effect" onclick="hapusRow(this)">
+                                                    <button type="button" class="btn btn-xs btn-danger waves-effect btn-hapus-row">
                                                         <i class="material-icons">delete</i>
                                                     </button>
                                                 </td>
@@ -258,77 +336,126 @@ if (isset($_POST['simpan_transaksi'])) {
     <?php include '../script.php'; ?>
 
     <script>
-        let rowIndex = 1;
+        (function() {
+            let rowIndex = 1;
 
-        document.getElementById('btn_tambah_row').addEventListener('click', function() {
-            const tbody = document.getElementById('tbody_items');
-            const tr = document.createElement('tr');
-            tr.className = 'item-row';
-
-            // Mengambil innerHTML dari select pertama secara otomatis
-            const menuOptions = document.querySelector('.select-menu').innerHTML;
-
-            tr.innerHTML = `
-                <td>
-                    <select class="form-control select-menu" name="items[${rowIndex}][menu_id]" onchange="updateHarga(this)" required>
-                        ${menuOptions}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="form-control input-harga text-right-input" name="items[${rowIndex}][harga]" value="0" readonly>
-                </td>
-                <td>
-                    <input type="number" class="form-control input-qty text-right-input" name="items[${rowIndex}][qty]" value="1" min="1" oninput="hitungRow(this)" required>
-                </td>
-                <td>
-                    <input type="number" class="form-control input-subtotal text-right-input" name="items[${rowIndex}][subtotal]" value="0" readonly>
-                </td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-xs btn-danger waves-effect" onclick="hapusRow(this)">
-                        <i class="material-icons">delete</i>
-                    </button>
-                </td>
+            const menuOptionsHtml = `
+                <option value="">-- Pilih Menu --</option>
+                <?php foreach ($data_menu as $menu_item): ?>
+                    <option value="<?= $menu_item['id']; ?>" data-harga="<?= $menu_item['harga']; ?>">
+                        <?= htmlspecialchars($menu_item['nama_menu'], ENT_QUOTES); ?>
+                    </option>
+                <?php endforeach; ?>
             `;
-            tbody.appendChild(tr);
-            rowIndex++;
-        });
 
-        function updateHarga(selectEl) {
-            const row = selectEl.closest('tr');
-            const selectedOption = selectEl.options[selectEl.selectedIndex];
-            const harga = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
-
-            row.querySelector('.input-harga').value = harga;
-            hitungRow(selectEl);
-        }
-
-        function hitungRow(element) {
-            const row = element.closest('tr');
-            const harga = parseFloat(row.querySelector('.input-harga').value) || 0;
-            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-            const subtotal = harga * qty;
-
-            row.querySelector('.input-subtotal').value = subtotal;
-            hitungTotal();
-        }
-
-        function hapusRow(btn) {
-            const rows = document.querySelectorAll('.item-row');
-            if (rows.length > 1) {
-                btn.closest('tr').remove();
-                hitungTotal();
-            } else {
-                alert('Minimal harus ada 1 item menu!');
+            function initSelectPicker(targetContainer) {
+                if (typeof window.jQuery !== 'undefined' && typeof window.jQuery.fn.selectpicker === 'function') {
+                    window.jQuery(targetContainer).find('select.select-menu').selectpicker('render');
+                }
             }
-        }
 
-        function hitungTotal() {
-            let total = 0;
-            document.querySelectorAll('.input-subtotal').forEach(function(input) {
-                total += parseFloat(input.value) || 0;
+            function updateHargaDariSelect(selectElement) {
+                const row = selectElement.closest('tr');
+                if (!row) {
+                    return;
+                }
+
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                const harga = selectedOption ? (parseFloat(selectedOption.getAttribute('data-harga')) || 0) : 0;
+
+                row.querySelector('.input-harga').value = harga;
+                hitungRow(row);
+            }
+
+            function hitungRow(rowElement) {
+                if (!rowElement) {
+                    return;
+                }
+
+                const harga = parseFloat(rowElement.querySelector('.input-harga').value) || 0;
+                const qty = parseFloat(rowElement.querySelector('.input-qty').value) || 0;
+                const subtotal = harga * qty;
+
+                rowElement.querySelector('.input-subtotal').value = subtotal;
+                hitungTotal();
+            }
+
+            function hitungTotal() {
+                let total = 0;
+                document.querySelectorAll('.input-subtotal').forEach(function(subtotalInput) {
+                    total += parseFloat(subtotalInput.value) || 0;
+                });
+                document.getElementById('input_total_harga').value = total;
+            }
+
+            document.getElementById('btn_tambah_row').addEventListener('click', function() {
+                const tbody = document.getElementById('tbody_items');
+                const newRow = document.createElement('tr');
+                newRow.className = 'item-row';
+
+                newRow.innerHTML = `
+                    <td>
+                        <select class="form-control select-menu" name="items[${rowIndex}][menu_id]" required>
+                            ${menuOptionsHtml}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control input-harga text-right-input" name="items[${rowIndex}][harga]" value="0" readonly>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control input-qty text-right-input" name="items[${rowIndex}][qty]" value="1" min="1" required>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control input-subtotal text-right-input" name="items[${rowIndex}][subtotal]" value="0" readonly>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-xs btn-danger waves-effect btn-hapus-row">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(newRow);
+                initSelectPicker(newRow);
+                rowIndex++;
             });
-            document.getElementById('input_total_harga').value = total;
-        }
+
+            document.getElementById('tbody_items').addEventListener('change', function(event) {
+                if (event.target && event.target.classList.contains('select-menu')) {
+                    updateHargaDariSelect(event.target);
+                }
+            });
+
+            document.getElementById('tbody_items').addEventListener('input', function(event) {
+                if (event.target && event.target.classList.contains('input-qty')) {
+                    hitungRow(event.target.closest('tr'));
+                }
+            });
+
+            document.getElementById('tbody_items').addEventListener('click', function(event) {
+                const hapusButton = event.target.closest('.btn-hapus-row');
+                if (!hapusButton) {
+                    return;
+                }
+
+                const rows = document.querySelectorAll('.item-row');
+                if (rows.length > 1) {
+                    hapusButton.closest('tr').remove();
+                    hitungTotal();
+                } else {
+                    alert('Minimal harus ada 1 item menu!');
+                }
+            });
+
+            if (typeof window.jQuery !== 'undefined') {
+                window.jQuery(document).ready(function() {
+                    initSelectPicker(document);
+                    hitungTotal();
+                });
+            } else {
+                hitungTotal();
+            }
+        })();
     </script>
 </body>
 
