@@ -1,3 +1,15 @@
+<?php
+$document_root = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
+$footer_folder = rtrim(str_replace('\\', '/', __DIR__), '/');
+
+$base_url_path = '';
+if ($document_root !== '' && strpos($footer_folder, $document_root) === 0) {
+    $base_url_path = substr($footer_folder, strlen($document_root));
+}
+
+$logo_path = $base_url_path . '/image/logo_resto.jpg';
+?>
+
 <style>
 /* Menjaga tinggi area konten agar footer terdorong ke bawah tanpa merusak layout */
 section.content {
@@ -19,7 +31,7 @@ section.content {
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div style="background-color: #bb0a1e; padding: 12px 20px; border-radius: 4px; color: #ffffff;">
             <div class="pull-left" style="line-height: 28px;">
-                <img src="/project_resto_real/image/logo_resto.jpg" alt="POS" style="width: 25px; height: 28px; vertical-align: middle; margin-right: 8px;">
+                <img src="<?= htmlspecialchars($logo_path, ENT_QUOTES); ?>" alt="POS" style="width: 25px; height: 28px; vertical-align: middle; margin-right: 8px;">
                 <span style="vertical-align: middle;">SISTEM PENJUALAN RESTO | Copyright &copy; MP BUMIAYU <?= date("Y"); ?></span>
             </div>
             <div class="pull-right hidden-xs" style="line-height: 28px;">
